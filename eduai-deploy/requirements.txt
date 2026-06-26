@@ -1,0 +1,10 @@
+flask
+flask-cors
+sqlalchemy
+gunicorn
+requests
+python-dotenv
+PyPDF2
+anthropic
+openai
+bcrypt
