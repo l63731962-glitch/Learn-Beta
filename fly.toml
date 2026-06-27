@@ -1,11 +1,7 @@
-app = "learn-beta-00"
+app = "learn-beta-2"
 primary_region = "jnb"
 
 [build]
-  dockerfile = "eduai-deploy/Dockerfile"
-
-[build.args]
-  APP_DIR = "eduai-deploy"
 
 [http_service]
   internal_port = 8080
