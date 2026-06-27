@@ -48,36 +48,68 @@ _OTP_TTL = 600  # 10 minutes
 
 
 def _send_otp_email(to_email: str, otp: str) -> bool:
-    """Send OTP via Gmail SMTP. Returns True on success."""
-    smtp_user = os.getenv("EDUAI_SMTP_USER", "")   # your Gmail address
-    smtp_pass = os.getenv("EDUAI_SMTP_PASS", "")   # Gmail App Password
+    """Send OTP via Resend API. Falls back to SMTP if no Resend key."""
+    import urllib.request
+
+    resend_key = os.getenv("RESEND_API_KEY", "")
+
+    html = f"""
+    <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;
+                background:#ffffff;border-radius:16px;color:#111111;
+                border:1px solid #e5e7eb;">
+      <h2 style="color:#7c3aed;margin-bottom:8px;">🎓 EduAI Learn</h2>
+      <p style="color:#6b7280;margin-bottom:24px;">Email Verification</p>
+      <div style="background:#f5f3ff;border:2px solid #7c3aed;border-radius:12px;
+                  padding:24px;text-align:center;margin-bottom:24px;">
+        <p style="color:#374151;font-size:14px;margin-bottom:8px;">Your verification code</p>
+        <div style="font-size:48px;font-weight:700;letter-spacing:12px;color:#7c3aed;">
+          {otp}
+        </div>
+      </div>
+      <p style="color:#374151;font-size:13px;">This code expires in <strong>10 minutes</strong>.</p>
+      <p style="color:#9ca3af;font-size:13px;">If you didn't request this, ignore this email.</p>
+    </div>
+    """
+
+    # ── Try Resend first ─────────────────────────────────────────────────
+    if resend_key:
+        try:
+            payload = json.dumps({
+                "from": "EduAI Learn <onboarding@resend.dev>",
+                "to":   [to_email],
+                "subject": "Your EduAI Verification Code",
+                "html": html,
+            }).encode("utf-8")
+
+            req = urllib.request.Request(
+                "https://api.resend.com/emails",
+                data=payload,
+                headers={
+                    "Authorization": f"Bearer {resend_key}",
+                    "Content-Type":  "application/json",
+                },
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                result = json.loads(resp.read())
+                print(f"[EDUAI-OTP] ✅ Resend sent: {result.get('id')}")
+                return True
+        except Exception as e:
+            print(f"[EDUAI-OTP] ❌ Resend failed: {e}")
+            return False
+
+    # ── Fallback: Gmail SMTP ──────────────────────────────────────────────
+    smtp_user = os.getenv("EDUAI_SMTP_USER", "")
+    smtp_pass = os.getenv("EDUAI_SMTP_PASS", "")
     if not smtp_user or not smtp_pass:
-        print(f"[EDUAI-OTP] ⚠️  SMTP not configured — OTP for {to_email}: {otp}")
-        return True  # dev fallback: just log it
+        print(f"[EDUAI-OTP] ⚠️  No email provider configured — OTP for {to_email}: {otp}")
+        return True  # dev fallback: log it
 
     try:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = "Your EduAI Verification Code"
         msg["From"]    = smtp_user
         msg["To"]      = to_email
-
-        html = f"""
-        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;
-                    background:#ffffff;border-radius:16px;color:#111111;
-                    border:1px solid #e5e7eb;">
-          <h2 style="color:#7c3aed;margin-bottom:8px;">🎓 EduAI Learn</h2>
-          <p style="color:#6b7280;margin-bottom:24px;">Email Verification</p>
-          <div style="background:#f5f3ff;border:2px solid #7c3aed;border-radius:12px;
-                      padding:24px;text-align:center;margin-bottom:24px;">
-            <p style="color:#374151;font-size:14px;margin-bottom:8px;">Your verification code</p>
-            <div style="font-size:48px;font-weight:700;letter-spacing:12px;color:#7c3aed;">
-              {otp}
-            </div>
-          </div>
-          <p style="color:#374151;font-size:13px;">This code expires in <strong>10 minutes</strong>.</p>
-          <p style="color:#9ca3af;font-size:13px;">If you didn't request this, ignore this email.</p>
-        </div>
-        """
         msg.attach(MIMEText(html, "html"))
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
@@ -85,7 +117,7 @@ def _send_otp_email(to_email: str, otp: str) -> bool:
             server.sendmail(smtp_user, to_email, msg.as_string())
         return True
     except Exception as e:
-        print(f"[EDUAI-OTP] ❌ Email send failed: {e}")
+        print(f"[EDUAI-OTP] ❌ SMTP failed: {e}")
         return False
 
 # Ensure tables exist when this blueprint is first imported
