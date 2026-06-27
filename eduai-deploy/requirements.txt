@@ -8,3 +8,4 @@ PyPDF2
 anthropic
 openai
 bcrypt
+psycopg2-binary
