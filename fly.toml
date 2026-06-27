@@ -1,0 +1,20 @@
+app = "learn-beta-00"
+primary_region = "jnb"
+
+[build]
+  dockerfile = "eduai-deploy/Dockerfile"
+
+[build.args]
+  APP_DIR = "eduai-deploy"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1
