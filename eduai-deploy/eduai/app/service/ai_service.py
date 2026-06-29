@@ -2,8 +2,13 @@
 eduai/app/services/ai_service.py
 ─────────────────────────────────────────────────────────────────────────────
 ALL AI calls for EduAI routed through this module.
-Uses the existing config.py (openai_client, ANTHROPIC_API_KEY, etc.)
-so no new API keys or clients are needed.
+
+Both provider options in the UI toggle ("anthropic" / "openai") now go
+through a SINGLE backend: OpenRouter (https://openrouter.ai). One API key,
+one endpoint. The toggle still controls which underlying model gets used —
+"anthropic" → a Claude model served via OpenRouter, "openai" → a GPT model
+served via OpenRouter. No direct calls to api.anthropic.com or the OpenAI
+SDK/client remain.
 
 Supports:
   • Lesson note generation (streaming + non-streaming)
@@ -20,20 +25,30 @@ import re
 import json
 from typing import Generator, Optional
 
-# ── Import from OMEGA's existing config ──────────────────────────────────────
-# config.py is at project root — already on sys.path via mains.py
-try:
-    from config import openai_client, PRIMARY_MODEL, SYSTEM_PROMPT as OMEGA_SYSTEM
-    _OPENAI_OK = openai_client is not None
-except Exception:
-    openai_client  = None
-    PRIMARY_MODEL  = "gpt-4o"
-    OMEGA_SYSTEM   = ""
-    _OPENAI_OK     = False
+# ── OpenRouter config ─────────────────────────────────────────────────────
+# Single key, single endpoint for both toggle options.
+# Set OPENROUTER_API_KEY in your .env (replaces ANTHROPIC_API_KEY / OPENAI_API_KEY).
+OPENROUTER_KEY  = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_URL  = "https://openrouter.ai/api/v1/chat/completions"
+_OPENROUTER_OK  = bool(OPENROUTER_KEY)
 
-ANTHROPIC_KEY  = os.getenv("ANTHROPIC_API_KEY", "")
-CLAUDE_MODEL   = "claude-sonnet-4-20250514"
-_ANTHROPIC_OK  = bool(ANTHROPIC_KEY)
+# Optional headers OpenRouter uses for its public leaderboard / rankings.
+# Harmless to leave as-is; change to your real domain/app name if you like.
+OPENROUTER_SITE_URL  = os.getenv("OPENROUTER_SITE_URL", "https://learn-beta-ftw5qr.appdeploy.ai")
+OPENROUTER_SITE_NAME = os.getenv("OPENROUTER_SITE_NAME", "Learn-Beta")
+
+# Model used when the toggle is set to each provider value.
+# These are OpenRouter "vendor/model" slugs — change freely without touching
+# any call site below.
+PROVIDER_MODELS = {
+    "anthropic": os.getenv("OPENROUTER_CLAUDE_MODEL", "anthropic/claude-sonnet-4"),
+    "openai":    os.getenv("OPENROUTER_OPENAI_MODEL", "openai/gpt-4o"),
+}
+DEFAULT_PROVIDER = "openai"
+
+# Backward-compat flags some older code in this file may still reference.
+_ANTHROPIC_OK = _OPENROUTER_OK
+_OPENAI_OK    = _OPENROUTER_OK
 
 # ── Age / class calibration strings ─────────────────────────────────────────
 _AGE_GUIDES = {
@@ -60,101 +75,125 @@ _AGE_GUIDES = {
 }
 
 
-def _anthropic_chat(messages: list, system: str, max_tokens: int = 4000) -> Optional[str]:
-    """Non-streaming call to Claude via direct HTTP (no anthropic SDK needed)."""
+def _resolve_model(provider: Optional[str]) -> str:
+    """Map a toggle value ('anthropic' | 'openai') to an OpenRouter model slug."""
+    key = (provider or DEFAULT_PROVIDER).lower()
+    return PROVIDER_MODELS.get(key, PROVIDER_MODELS[DEFAULT_PROVIDER])
+
+
+def _openrouter_headers() -> dict:
+    return {
+        "Content-Type":  "application/json",
+        "Authorization": f"Bearer {OPENROUTER_KEY}",
+        # Optional but recommended by OpenRouter for attribution/rankings.
+        "HTTP-Referer":  OPENROUTER_SITE_URL,
+        "X-Title":       OPENROUTER_SITE_NAME,
+    }
+
+
+def _openrouter_chat(
+    messages: list,
+    system: str,
+    max_tokens: int = 4000,
+    provider: Optional[str] = None,
+) -> Optional[str]:
+    """Non-streaming call via OpenRouter. `provider` picks the underlying model."""
     import requests
-    if not _ANTHROPIC_OK:
+    if not _OPENROUTER_OK:
         return None
+    model = _resolve_model(provider)
     try:
+        full_messages = [{"role": "system", "content": system}] + messages
         r = requests.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "Content-Type":      "application/json",
-                "x-api-key":         ANTHROPIC_KEY,
-                "anthropic-version": "2023-06-01",
-            },
+            OPENROUTER_URL,
+            headers=_openrouter_headers(),
             json={
-                "model":      CLAUDE_MODEL,
+                "model":      model,
                 "max_tokens": max_tokens,
-                "system":     system,
-                "messages":   messages,
+                "messages":   full_messages,
             },
             timeout=120,
         )
         if r.ok:
-            return r.json()["content"][0]["text"]
-        print(f"[EDUAI-AI] Anthropic error {r.status_code}: {r.text[:200]}")
+            return r.json()["choices"][0]["message"]["content"].strip()
+        print(f"[EDUAI-AI] OpenRouter error {r.status_code} ({model}): {r.text[:200]}")
         return None
     except Exception as e:
-        print(f"[EDUAI-AI] Anthropic call failed: {e}")
+        print(f"[EDUAI-AI] OpenRouter call failed ({model}): {e}")
         return None
 
 
-def _openai_chat(messages: list, system: str, max_tokens: int = 4000) -> Optional[str]:
-    """Non-streaming call via OpenAI SDK (already in config.py)."""
-    if not _OPENAI_OK:
-        return None
-    try:
-        full = [{"role": "system", "content": system}] + messages
-        r = openai_client.chat.completions.create(
-            model=PRIMARY_MODEL, max_tokens=max_tokens, messages=full
-        )
-        return r.choices[0].message.content.strip()
-    except Exception as e:
-        print(f"[EDUAI-AI] OpenAI call failed: {e}")
-        return None
+def _ai_call(
+    messages: list,
+    system: str,
+    max_tokens: int = 4000,
+    provider: Optional[str] = None,
+) -> Optional[str]:
+    """
+    Single entry point for non-streaming generation.
+    `provider` ('anthropic' | 'openai') selects the model via OpenRouter;
+    defaults to DEFAULT_PROVIDER if not given so existing callers keep working.
+    """
+    return _openrouter_chat(messages, system, max_tokens, provider=provider)
 
 
-def _ai_call(messages: list, system: str, max_tokens: int = 4000) -> Optional[str]:
-    """Try OpenAI first, fall back to Anthropic."""
-    result = _anthropic_chat(messages, system, max_tokens)
-    if result:
-        return result
-    return _openai_chat(messages, system, max_tokens)
-
-
-def _anthropic_stream(messages: list, system: str, max_tokens: int = 4000) -> Generator[str, None, None]:
-    """Streaming generator for Claude — yields text deltas."""
+def _openrouter_stream(
+    messages: list,
+    system: str,
+    max_tokens: int = 4000,
+    provider: Optional[str] = None,
+) -> Generator[str, None, None]:
+    """Streaming generator via OpenRouter — yields text deltas."""
     import requests
-    if not _ANTHROPIC_OK:
-        # Fall back to non-streaming OpenAI and yield the whole thing at once
-        result = _openai_chat(messages, system, max_tokens)
-        if result:
-            yield result
+    if not _OPENROUTER_OK:
         return
+    model = _resolve_model(provider)
     try:
+        full_messages = [{"role": "system", "content": system}] + messages
         r = requests.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "Content-Type":      "application/json",
-                "x-api-key":         ANTHROPIC_KEY,
-                "anthropic-version": "2023-06-01",
-            },
+            OPENROUTER_URL,
+            headers=_openrouter_headers(),
             json={
-                "model":      CLAUDE_MODEL,
+                "model":      model,
                 "max_tokens": max_tokens,
-                "system":     system,
-                "messages":   messages,
+                "messages":   full_messages,
                 "stream":     True,
             },
             stream=True,
             timeout=120,
         )
+        if not r.ok:
+            print(f"[EDUAI-AI] OpenRouter stream error {r.status_code} ({model}): {r.text[:200]}")
+            return
         for line in r.iter_lines():
             if not line:
                 continue
             text = line.decode("utf-8") if isinstance(line, bytes) else line
             if text.startswith("data: "):
+                payload = text[6:]
+                if payload.strip() == "[DONE]":
+                    break
                 try:
-                    d = json.loads(text[6:])
-                    if d.get("type") == "content_block_delta":
-                        delta = d.get("delta", {}).get("text", "")
-                        if delta:
-                            yield delta
+                    d = json.loads(payload)
+                    delta = d.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                    if delta:
+                        yield delta
                 except Exception:
                     pass
     except Exception as e:
-        print(f"[EDUAI-AI] Stream error: {e}")
+        print(f"[EDUAI-AI] OpenRouter stream failed ({model}): {e}")
+
+
+# Back-compat alias: existing call sites in this file use `_anthropic_stream(...)`.
+# Keeping the name avoids touching every call site below; behavior now routes
+# through OpenRouter using DEFAULT_PROVIDER unless a provider is passed through.
+def _anthropic_stream(
+    messages: list,
+    system: str,
+    max_tokens: int = 4000,
+    provider: Optional[str] = None,
+) -> Generator[str, None, None]:
+    yield from _openrouter_stream(messages, system, max_tokens, provider=provider)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -170,6 +209,7 @@ def generate_lesson_note(
     curriculum: str,
     language:   str,
     stream:     bool = False,
+    provider:   str = None,
 ):
     """
     Generate a complete, structured lesson note.
@@ -255,9 +295,9 @@ Write EVERYTHING in {language}. Be thorough — this must be the best lesson not
     messages = [{"role": "user", "content": prompt}]
 
     if stream:
-        return _anthropic_stream(messages, system, max_tokens=4000)
+        return _anthropic_stream(messages, system, max_tokens=4000, provider=provider)
     else:
-        return _ai_call(messages, system, max_tokens=4000)
+        return _ai_call(messages, system, max_tokens=4000, provider=provider)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -273,6 +313,7 @@ def generate_test_questions(
     difficulty:  str,
     question_types: list,
     language:    str,
+    provider:    str = None,
 ) -> Optional[str]:
     """Generate raw test questions as formatted text. Returns full AI output."""
 
@@ -311,6 +352,7 @@ Write EVERYTHING in {language}."""
         [{"role": "user", "content": prompt}],
         system,
         max_tokens=min(4000, num_q * 150 + 500),
+        provider=provider,
     )
 
 
@@ -365,6 +407,7 @@ def explain_topic(
     sub_class:   str,
     language:    str,
     stream:      bool = False,
+    provider:    str = None,
 ):
     """
     Generate a learner-appropriate explanation of any topic.
@@ -412,8 +455,8 @@ Write entirely in {language}. Make it so clear that a complete beginner understa
 
     messages = [{"role": "user", "content": prompt}]
     if stream:
-        return _anthropic_stream(messages, system, max_tokens=3000)
-    return _ai_call(messages, system, max_tokens=3000)
+        return _anthropic_stream(messages, system, max_tokens=3000, provider=provider)
+    return _ai_call(messages, system, max_tokens=3000, provider=provider)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -428,6 +471,7 @@ def generate_quiz(
     num_q:       int,
     difficulty:  str,
     language:    str,
+    provider:    str = None,
 ) -> Optional[list]:
     """
     Generate quiz questions as a parsed list of dicts.
@@ -458,7 +502,7 @@ Return ONLY this JSON (no markdown, no extra text):
 "correct" is the 0-based index of the correct option (0=A, 1=B, 2=C, 3=D).
 All text must be in {language}. Generate all {num_q} questions."""
 
-    raw = _ai_call([{"role": "user", "content": prompt}], system, max_tokens=min(4000, num_q * 150))
+    raw = _ai_call([{"role": "user", "content": prompt}], system, max_tokens=min(4000, num_q * 150), provider=provider)
     if not raw:
         return None
 
@@ -490,6 +534,7 @@ def tutor_chat(
     class_level: str,
     sub_class:   str,
     language:    str,
+    provider:    str = None,
 ) -> Optional[str]:
     """
     Respond as the class-appropriate AI tutor.
@@ -511,7 +556,7 @@ def tutor_chat(
     messages = list(history[-20:])  # cap context at 20 turns
     messages.append({"role": "user", "content": message})
 
-    return _ai_call(messages, system, max_tokens=1000)
+    return _ai_call(messages, system, max_tokens=1000, provider=provider)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -523,6 +568,7 @@ def extract_sow_topics(
     class_level: str,
     curriculum:  str,
     file_text:   str = "",
+    provider:    str = None,
 ) -> Optional[list]:
     """
     Extract or generate a 12-week scheme of work.
@@ -550,7 +596,7 @@ def extract_sow_topics(
             f'[{{"week":1,"topic":"Topic Name","objectives":"Key learning objectives"}}]'
         )
 
-    raw = _ai_call([{"role": "user", "content": prompt}], system, max_tokens=1500)
+    raw = _ai_call([{"role": "user", "content": prompt}], system, max_tokens=1500, provider=provider)
     if not raw:
         return None
     try:
@@ -577,6 +623,7 @@ def generate_performance_insight(
     weak_topics:  list,
     num_students: int,
     language:     str = "English",
+    provider:     str = None,
 ) -> Optional[str]:
     """
     Generate an AI-written class performance insight for the teacher dashboard.
@@ -592,18 +639,18 @@ def generate_performance_insight(
         f"Include: what the average means, which areas need more practice, "
         f"and one specific teaching recommendation."
     )
-    return _ai_call([{"role": "user", "content": prompt}], system, max_tokens=300)
+    return _ai_call([{"role": "user", "content": prompt}], system, max_tokens=300, provider=provider)
 
 
 # ════════════════════════════════════════════════════════════════════════════
 # TEXTBOOK PHOTO SCANNER (vision)
 # ════════════════════════════════════════════════════════════════════════════
-# NOTE: Vision input requires the Anthropic API specifically — the OpenAI
-# fallback (_openai_chat) uses a different message format for images and is
-# NOT used here. If ANTHROPIC_API_KEY is missing, these functions return None
-# and the route layer should report a clear "AI vision unavailable" error
-# rather than silently falling back to a text-only model that can't see the
-# photo.
+# Vision now goes through OpenRouter too, using OpenAI-style image_url/data-URI
+# messages (the format OpenRouter expects regardless of which vendor model —
+# anthropic/claude-* or openai/gpt-4o — ends up serving the request). If
+# OPENROUTER_API_KEY is missing, this returns None and the route layer should
+# report a clear "AI vision unavailable" error rather than silently falling
+# back to a text-only model that can't see the photo.
 
 _IMG_MEDIA_TYPES = {
     "jpg":  "image/jpeg",
@@ -620,6 +667,7 @@ def scan_textbook_page(
     class_level: str,
     sub_class:   str,
     language:    str,
+    provider:    str = None,
 ) -> Optional[dict]:
     """
     Analyze a photo of a textbook page. Returns:
@@ -630,7 +678,7 @@ def scan_textbook_page(
       }
     Returns None if vision is unavailable or the call fails.
     """
-    if not _ANTHROPIC_OK:
+    if not _OPENROUTER_OK:
         return None
 
     media_type = _IMG_MEDIA_TYPES.get(image_ext.lower(), "image/jpeg")
@@ -661,19 +709,15 @@ def scan_textbook_page(
     messages = [{
         "role": "user",
         "content": [
-            {
-                "type": "image",
-                "source": {
-                    "type": "base64",
-                    "media_type": media_type,
-                    "data": image_b64,
-                },
-            },
             {"type": "text", "text": prompt_text},
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:{media_type};base64,{image_b64}"},
+            },
         ],
     }]
 
-    raw = _anthropic_chat(messages, system, max_tokens=2000)
+    raw = _ai_call(messages, system, max_tokens=2000, provider=provider)
     if not raw:
         return None
 
@@ -694,6 +738,7 @@ def generate_quiz_from_text(
     sub_class:   str,
     language:    str,
     num_q:       int = 5,
+    provider:    str = None,
 ) -> Optional[list]:
     """
     Generate quiz questions from a block of extracted text (e.g. from a
@@ -721,7 +766,7 @@ Return ONLY this JSON:
 ]
 "correct" is the 0-based index of the correct option."""
 
-    raw = _ai_call([{"role": "user", "content": prompt}], system, max_tokens=min(3000, num_q * 150))
+    raw = _ai_call([{"role": "user", "content": prompt}], system, max_tokens=min(3000, num_q * 150), provider=provider)
     if not raw:
         return None
     try:
@@ -745,9 +790,8 @@ def detect_curriculum_gaps(
     quiz_history: list,
     test_history: list,
     language:     str = "English",
+    provider:     str = None,
 ) -> Optional[dict]:
-    """
-    Analyze a learner's quiz/test history and identify weak topics/subjects.
 
     quiz_history: list of {subject, topic, score_pct, difficulty}
     test_history: list of {subject, class_level, score_pct}  (CBT results)
@@ -808,7 +852,7 @@ Return ONLY this JSON:
 List at most 5 gaps, ordered by severity (high first). If the student has no
 clear weak areas, return an empty "gaps" array and a positive "summary"."""
 
-    raw = _ai_call([{"role": "user", "content": prompt}], system, max_tokens=1200)
+    raw = _ai_call([{"role": "user", "content": prompt}], system, max_tokens=1200, provider=provider)
     if not raw:
         return None
     try:
@@ -831,6 +875,7 @@ def assess_exam_readiness(
     quiz_history: list,
     test_history: list,
     language:     str = "English",
+    provider:     str = None,
 ) -> Optional[dict]:
     """
     Estimate a learner's readiness for a target exam (WAEC, JAMB, NECO, etc.)
