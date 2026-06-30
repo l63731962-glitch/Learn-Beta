@@ -1,10 +1,10 @@
-# fly.toml app configuration file generated for learn-beta-2 on 2026-06-27T01:39:28Z
+# fly.toml app configuration file generated for learn-beta-10 on 2026-06-30T15:16:05Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'learn-beta-2'
-primary_region = 'jnb'
+app = 'learn-beta-10'
+primary_region = 'ams'
 
 [build]
 
