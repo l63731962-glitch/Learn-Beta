@@ -72,6 +72,34 @@ def _send_otp_email(to_email: str, otp: str) -> bool:
     """
 
     # ── Try Resend first ─────────────────────────────────────────────────
+
+# ── Mailjet — HTTPS API, auto-validated sender, no domain needed ───────
+    import base64
+    mj_key, mj_secret = os.getenv("MJ_APIKEY_PUBLIC", ""), os.getenv("MJ_APIKEY_PRIVATE", "")
+    if mj_key and mj_secret:
+        try:
+            payload = json.dumps({
+                "Messages": [{
+                    "From":    {"Email": os.getenv("MJ_SENDER_EMAIL", ""), "Name": "EduAI Learn"},
+                    "To":      [{"Email": to_email}],
+                    "Subject": "Your EduAI Verification Code",
+                    "HTMLPart": html,
+                }]
+            }).encode("utf-8")
+            auth = base64.b64encode(f"{mj_key}:{mj_secret}".encode()).decode()
+            req = urllib.request.Request(
+                "https://api.mailjet.com/v3.1/send",
+                data=payload,
+                headers={"Authorization": f"Basic {auth}", "Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                json.loads(resp.read())
+                print("[EDUAI-OTP] ✅ Mailjet sent")
+                return True
+        except Exception as e:
+            print(f"[EDUAI-OTP] ❌ Mailjet failed: {e}")  # falls through to Resend/SMTP
+
     if resend_key:
         try:
             payload = json.dumps({
