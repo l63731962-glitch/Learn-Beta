@@ -792,7 +792,7 @@ def detect_curriculum_gaps(
     language:     str = "English",
     provider:     str = None,
 ) -> Optional[dict]:
-
+    """
     quiz_history: list of {subject, topic, score_pct, difficulty}
     test_history: list of {subject, class_level, score_pct}  (CBT results)
 
