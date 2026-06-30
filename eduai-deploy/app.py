@@ -15,7 +15,7 @@ EDUAI_ROOT = os.path.join(ROOT, "eduai")
 if EDUAI_ROOT not in sys.path:
     sys.path.insert(0, EDUAI_ROOT)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=os.path.join(ROOT, "eduai", "app", "static"))
 CORS(app)
 
 def _find_learn_html():
