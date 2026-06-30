@@ -3313,6 +3313,641 @@
         background: #1a1040;
         color: #fff;
       }
+
+      /* ═══════════════════════════════════════════════════════════════════
+         GLOBAL EVENT THEME ENGINE — CSS VARIABLE & LAYOUT BLOCK
+         Authored by: Principal Frontend Engineer & Lead UI/UX Architect
+         Architecture: data-attribute driven, hardware-accelerated, FOUC-free
+      ═══════════════════════════════════════════════════════════════════ */
+
+      /* ── MASTER KINETIC TRANSITION ───────────────────────────────────── */
+      html, body, .card, .btn, .modal, .nav-bar, .sidebar, .input,
+      .chip, .toast, .lang-card, [class*="panel"], [class*="header"],
+      [class*="content"], [class*="container"], [class*="wrapper"],
+      [class*="section"], [class*="block"], [class*="box"] {
+        transition:
+          background-color 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+          background 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+          border-color 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+          color 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+          box-shadow 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+          text-shadow 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+          opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         THEME: DEFAULT CORPORATE (Fallback — no active event)
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme="default"] {
+        --theme-primary:        #6366f1;
+        --theme-accent:         #8b5cf6;
+        --theme-glow:           rgba(99, 102, 241, 0.45);
+        --theme-glow-soft:      rgba(99, 102, 241, 0.18);
+        --theme-text:           #e2e8f0;
+        --theme-text-muted:     rgba(226, 232, 240, 0.55);
+        --theme-surface:        rgba(17, 17, 30, 0.97);
+        --theme-surface-glass:  rgba(255, 255, 255, 0.045);
+        --theme-border:         rgba(255, 255, 255, 0.09);
+        --theme-gradient-hero:  linear-gradient(135deg, #0a0a0f 0%, #111127 50%, #0d0d1e 100%);
+        --theme-gradient-accent:linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+        --theme-banner-bg:      url("IMAGE_DEFAULT_CORPORATE_HERO_BANNER") center/cover no-repeat, linear-gradient(135deg,#0a0a0f,#111127);
+        --theme-overlay:        radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.22) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.15) 0%, transparent 60%);
+        --theme-scrollbar:      rgba(99, 102, 241, 0.4);
+        --theme-badge:          #6366f1;
+      }
+      html[data-active-theme="default"] body {
+        background: var(--theme-gradient-hero);
+        color: var(--theme-text);
+      }
+      html[data-active-theme="default"] body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: var(--theme-overlay);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         THEME: CHRISTMAS (Dec 20 – Dec 27)
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme="christmas"] {
+        --theme-primary:        #c0392b;
+        --theme-accent:         #27ae60;
+        --theme-glow:           rgba(192, 57, 43, 0.6);
+        --theme-glow-soft:      rgba(192, 57, 43, 0.22);
+        --theme-text:           #fef9f0;
+        --theme-text-muted:     rgba(254, 249, 240, 0.6);
+        --theme-surface:        rgba(12, 28, 12, 0.97);
+        --theme-surface-glass:  rgba(255, 255, 255, 0.055);
+        --theme-border:         rgba(192, 57, 43, 0.28);
+        --theme-gradient-hero:  linear-gradient(160deg, #0c1c0c 0%, #1a0a08 40%, #0e1e0e 100%);
+        --theme-gradient-accent:linear-gradient(135deg, #c0392b, #e74c3c, #27ae60);
+        --theme-banner-bg:      url("https://stockcake.com/i/enchanted-winter-wonderland_712539_692924") center/cover no-repeat, linear-gradient(160deg,#0c1c0c,#1a0808);
+        --theme-overlay:        radial-gradient(ellipse at 15% 40%, rgba(192,57,43,0.28) 0%, transparent 55%), radial-gradient(ellipse at 85% 20%, rgba(39,174,96,0.18) 0%, transparent 55%), radial-gradient(ellipse at 50% 90%, rgba(192,57,43,0.15) 0%, transparent 50%);
+        --theme-scrollbar:      rgba(192, 57, 43, 0.55);
+        --theme-badge:          #c0392b;
+      }
+      html[data-active-theme="christmas"] body {
+        background: var(--theme-gradient-hero);
+        color: var(--theme-text);
+      }
+      html[data-active-theme="christmas"] body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: var(--theme-overlay);
+        pointer-events: none;
+        z-index: 0;
+      }
+      /* Christmas animated snowfall layer */
+      html[data-active-theme="christmas"] body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,0.9) 0%, transparent 100%),
+          radial-gradient(2px 2px at 30% 10%, rgba(255,255,255,0.7) 0%, transparent 100%),
+          radial-gradient(3px 3px at 50% 35%, rgba(255,255,255,0.8) 0%, transparent 100%),
+          radial-gradient(2px 2px at 70% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+          radial-gradient(2px 2px at 90% 28%, rgba(255,255,255,0.75) 0%, transparent 100%),
+          radial-gradient(1px 1px at 20% 60%, rgba(255,255,255,0.5) 0%, transparent 100%),
+          radial-gradient(2px 2px at 45% 70%, rgba(255,255,255,0.65) 0%, transparent 100%),
+          radial-gradient(1px 1px at 65% 80%, rgba(255,255,255,0.55) 0%, transparent 100%),
+          radial-gradient(2px 2px at 80% 55%, rgba(255,255,255,0.7) 0%, transparent 100%),
+          radial-gradient(3px 3px at 35% 90%, rgba(255,255,255,0.6) 0%, transparent 100%),
+          radial-gradient(1px 1px at 55% 5%, rgba(255,255,255,0.8) 0%, transparent 100%),
+          radial-gradient(2px 2px at 75% 45%, rgba(255,255,255,0.5) 0%, transparent 100%);
+        background-size: 400px 400px;
+        pointer-events: none;
+        z-index: 0;
+        animation: christmas-snow 12s linear infinite;
+        opacity: 0.65;
+      }
+      @keyframes christmas-snow {
+        0%   { background-position: 0px 0px, 80px 0px, 160px 0px, 240px 0px, 320px 0px, 40px 0px, 120px 0px, 200px 0px, 280px 0px, 360px 0px, 60px 0px, 180px 0px; }
+        100% { background-position: 0px 400px, 80px 520px, 160px 480px, 240px 560px, 320px 440px, 40px 500px, 120px 460px, 200px 540px, 280px 420px, 360px 480px, 60px 510px, 180px 450px; }
+      }
+      /* Christmas theme — card & UI accent overrides */
+      html[data-active-theme="christmas"] .card,
+      html[data-active-theme="christmas"] .modal {
+        background: rgba(15, 32, 15, 0.88);
+        border-color: rgba(192, 57, 43, 0.32);
+        box-shadow:
+          0 0 32px rgba(192, 57, 43, 0.18),
+          0 0 80px rgba(39, 174, 96, 0.1),
+          0 8px 32px rgba(0,0,0,0.5);
+        backdrop-filter: blur(24px);
+      }
+      html[data-active-theme="christmas"] .btn-primary {
+        background: linear-gradient(135deg, #c0392b, #e74c3c);
+        box-shadow: 0 4px 20px rgba(192, 57, 43, 0.5), 0 0 40px rgba(192,57,43,0.2);
+        text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+      }
+      html[data-active-theme="christmas"] .btn-primary:hover {
+        box-shadow: 0 8px 36px rgba(192, 57, 43, 0.7), 0 0 60px rgba(192,57,43,0.3);
+      }
+      /* Christmas event badge */
+      .theme-event-banner[data-theme="christmas"] {
+        background: linear-gradient(135deg, rgba(192,57,43,0.95), rgba(39,174,96,0.85));
+        border-bottom: 1px solid rgba(192,57,43,0.5);
+        box-shadow: 0 4px 24px rgba(192,57,43,0.35);
+        text-shadow: 0 0 16px rgba(255,255,255,0.4), 0 2px 8px rgba(0,0,0,0.5);
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         THEME: NEW YEAR GALA (Dec 31 – Jan 3)
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme="newyear"] {
+        --theme-primary:        #f1c40f;
+        --theme-accent:         #e67e22;
+        --theme-glow:           rgba(241, 196, 15, 0.65);
+        --theme-glow-soft:      rgba(241, 196, 15, 0.22);
+        --theme-text:           #fffbef;
+        --theme-text-muted:     rgba(255, 251, 239, 0.58);
+        --theme-surface:        rgba(10, 8, 2, 0.97);
+        --theme-surface-glass:  rgba(241, 196, 15, 0.06);
+        --theme-border:         rgba(241, 196, 15, 0.3);
+        --theme-gradient-hero:  linear-gradient(160deg, #0a0800 0%, #1a1200 50%, #0d0a00 100%);
+        --theme-gradient-accent:linear-gradient(135deg, #f1c40f, #e67e22, #e74c3c, #9b59b6);
+        --theme-banner-bg:      url("https://www.freepixel.com/graphics/city-fireworks/free-photos-new-year-celebration-in-dubai-photo-a-vibrant-fireworks-display-illuminates-the-night-sky-above-a-ci-1004522060") center/cover no-repeat, linear-gradient(160deg,#0a0800,#1a1200);
+        --theme-overlay:        radial-gradient(ellipse at 50% 0%, rgba(241,196,15,0.3) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(230,126,34,0.2) 0%, transparent 55%), radial-gradient(ellipse at 80% 60%, rgba(155,89,182,0.15) 0%, transparent 50%);
+        --theme-scrollbar:      rgba(241, 196, 15, 0.55);
+        --theme-badge:          #f1c40f;
+      }
+      html[data-active-theme="newyear"] body {
+        background: var(--theme-gradient-hero);
+        color: var(--theme-text);
+      }
+      html[data-active-theme="newyear"] body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: var(--theme-overlay);
+        pointer-events: none;
+        z-index: 0;
+      }
+      /* New Year: gold shimmer pulse */
+      html[data-active-theme="newyear"] body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          conic-gradient(from 0deg at 50% 50%, rgba(241,196,15,0.04) 0deg, transparent 60deg, rgba(241,196,15,0.06) 120deg, transparent 180deg, rgba(230,126,34,0.04) 240deg, transparent 300deg, rgba(241,196,15,0.04) 360deg);
+        pointer-events: none;
+        z-index: 0;
+        animation: newyear-shimmer 8s linear infinite;
+      }
+      @keyframes newyear-shimmer {
+        0%   { transform: rotate(0deg) scale(2.5); opacity: 0.6; }
+        100% { transform: rotate(360deg) scale(2.5); opacity: 0.6; }
+      }
+      html[data-active-theme="newyear"] .card,
+      html[data-active-theme="newyear"] .modal {
+        background: rgba(20, 16, 0, 0.88);
+        border-color: rgba(241, 196, 15, 0.35);
+        box-shadow:
+          0 0 32px rgba(241, 196, 15, 0.2),
+          0 0 80px rgba(230, 126, 34, 0.1),
+          0 8px 32px rgba(0,0,0,0.6);
+        backdrop-filter: blur(24px);
+      }
+      html[data-active-theme="newyear"] .btn-primary {
+        background: linear-gradient(135deg, #c9a200, #f1c40f);
+        color: #0a0800;
+        box-shadow: 0 4px 20px rgba(241, 196, 15, 0.5), 0 0 40px rgba(241,196,15,0.25);
+        text-shadow: none;
+        font-weight: 800;
+      }
+      html[data-active-theme="newyear"] .btn-primary:hover {
+        box-shadow: 0 8px 36px rgba(241, 196, 15, 0.75), 0 0 70px rgba(241,196,15,0.35);
+      }
+      .theme-event-banner[data-theme="newyear"] {
+        background: linear-gradient(135deg, rgba(10,8,0,0.96), rgba(30,22,0,0.96));
+        border-bottom: 2px solid rgba(241,196,15,0.55);
+        box-shadow: 0 0 40px rgba(241,196,15,0.3), 0 4px 24px rgba(0,0,0,0.5);
+        text-shadow: 0 0 30px rgba(241,196,15,0.8), 0 0 60px rgba(241,196,15,0.4), 0 2px 8px rgba(0,0,0,0.6);
+      }
+      /* Firework burst animations */
+      @keyframes firework-burst {
+        0%   { transform: scale(0) rotate(0deg); opacity: 1; }
+        60%  { transform: scale(1) rotate(180deg); opacity: 0.8; }
+        100% { transform: scale(1.4) rotate(360deg); opacity: 0; }
+      }
+      html[data-active-theme="newyear"] #theme-particle-canvas {
+        animation: none;
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         THEME: INDEPENDENCE CELEBRATION (July 3 – July 5)
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme="independence"] {
+        --theme-primary:        #b22234;
+        --theme-accent:         #3c3b6e;
+        --theme-glow:           rgba(178, 34, 52, 0.6);
+        --theme-glow-soft:      rgba(60, 59, 110, 0.25);
+        --theme-text:           #f0f4ff;
+        --theme-text-muted:     rgba(240, 244, 255, 0.58);
+        --theme-surface:        rgba(6, 6, 20, 0.97);
+        --theme-surface-glass:  rgba(60, 59, 110, 0.07);
+        --theme-border:         rgba(178, 34, 52, 0.32);
+        --theme-gradient-hero:  linear-gradient(160deg, #060614 0%, #0d0d28 50%, #14060a 100%);
+        --theme-gradient-accent:linear-gradient(135deg, #b22234, #ffffff, #3c3b6e);
+        --theme-banner-bg:      url("https://www.vecteezy.com/free-photos/red-white-and-blue-fireworks") center/cover no-repeat, linear-gradient(160deg,#060614,#0d0d28);
+        --theme-overlay:        radial-gradient(ellipse at 25% 35%, rgba(178,34,52,0.25) 0%, transparent 55%), radial-gradient(ellipse at 75% 65%, rgba(60,59,110,0.22) 0%, transparent 55%), radial-gradient(ellipse at 50% 10%, rgba(255,255,255,0.06) 0%, transparent 40%);
+        --theme-scrollbar:      rgba(178, 34, 52, 0.55);
+        --theme-badge:          #b22234;
+      }
+      html[data-active-theme="independence"] body {
+        background: var(--theme-gradient-hero);
+        color: var(--theme-text);
+      }
+      html[data-active-theme="independence"] body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: var(--theme-overlay);
+        pointer-events: none;
+        z-index: 0;
+      }
+      /* Independence: star-field shimmer */
+      html[data-active-theme="independence"] body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          radial-gradient(1px 1px at 5%  15%, rgba(255,255,255,0.85) 0%, transparent 100%),
+          radial-gradient(1px 1px at 18% 35%, rgba(255,255,255,0.7)  0%, transparent 100%),
+          radial-gradient(2px 2px at 32% 8%,  rgba(255,255,255,0.9)  0%, transparent 100%),
+          radial-gradient(1px 1px at 48% 22%, rgba(255,255,255,0.65) 0%, transparent 100%),
+          radial-gradient(1px 1px at 62% 42%, rgba(255,255,255,0.8)  0%, transparent 100%),
+          radial-gradient(2px 2px at 75% 12%, rgba(255,255,255,0.75) 0%, transparent 100%),
+          radial-gradient(1px 1px at 88% 30%, rgba(255,255,255,0.7)  0%, transparent 100%),
+          radial-gradient(1px 1px at 12% 65%, rgba(255,255,255,0.6)  0%, transparent 100%),
+          radial-gradient(1px 1px at 55% 70%, rgba(255,255,255,0.5)  0%, transparent 100%),
+          radial-gradient(1px 1px at 92% 58%, rgba(255,255,255,0.65) 0%, transparent 100%);
+        background-size: 500px 500px;
+        pointer-events: none;
+        z-index: 0;
+        animation: independence-stars 20s linear infinite;
+        opacity: 0.7;
+      }
+      @keyframes independence-stars {
+        0%   { background-position: 0px 0px; opacity: 0.5; }
+        50%  { opacity: 0.85; }
+        100% { background-position: 500px 100px; opacity: 0.5; }
+      }
+      html[data-active-theme="independence"] .card,
+      html[data-active-theme="independence"] .modal {
+        background: rgba(8, 8, 24, 0.88);
+        border-color: rgba(178, 34, 52, 0.38);
+        box-shadow:
+          0 0 28px rgba(178, 34, 52, 0.2),
+          0 0 60px rgba(60, 59, 110, 0.15),
+          0 8px 32px rgba(0,0,0,0.55);
+        backdrop-filter: blur(24px);
+      }
+      html[data-active-theme="independence"] .btn-primary {
+        background: linear-gradient(135deg, #8b0000, #b22234, #dc2c46);
+        box-shadow: 0 4px 20px rgba(178, 34, 52, 0.55), 0 0 40px rgba(178,34,52,0.22);
+        text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+      }
+      html[data-active-theme="independence"] .btn-primary:hover {
+        box-shadow: 0 8px 36px rgba(178, 34, 52, 0.75), 0 0 70px rgba(178,34,52,0.35);
+      }
+      .theme-event-banner[data-theme="independence"] {
+        background: linear-gradient(90deg, rgba(178,34,52,0.95) 0%, rgba(60,59,110,0.92) 50%, rgba(178,34,52,0.95) 100%);
+        border-bottom: 2px solid rgba(178,34,52,0.55);
+        box-shadow: 0 0 50px rgba(178,34,52,0.35), 0 4px 24px rgba(0,0,0,0.5);
+        text-shadow: 0 0 20px rgba(255,255,255,0.6), 0 0 40px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.6);
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         THEME: WORLD CHAMPIONSHIP / GLOBAL SPORTS EVENT (June 1 – July 15)
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme="worldchampionship"] {
+        --theme-primary:        #00b894;
+        --theme-accent:         #0984e3;
+        --theme-glow:           rgba(0, 184, 148, 0.6);
+        --theme-glow-soft:      rgba(9, 132, 227, 0.22);
+        --theme-text:           #edfffe;
+        --theme-text-muted:     rgba(237, 255, 254, 0.58);
+        --theme-surface:        rgba(0, 10, 14, 0.97);
+        --theme-surface-glass:  rgba(0, 184, 148, 0.06);
+        --theme-border:         rgba(0, 184, 148, 0.3);
+        --theme-gradient-hero:  linear-gradient(160deg, #00060a 0%, #001a1a 50%, #000a06 100%);
+        --theme-gradient-accent:linear-gradient(135deg, #00b894, #0984e3, #6c5ce7, #fdcb6e);
+        --theme-banner-bg:      url("https://a57.foxsports.com/statics.foxsports.com/www.foxsports.com/content/uploads/2026/03/1294/728/artboard-1.jpg?ve=1&tl=1") center/cover no-repeat, linear-gradient(160deg,#00060a,#001a14);
+        --theme-overlay:        radial-gradient(ellipse at 30% 30%, rgba(0,184,148,0.25) 0%, transparent 55%), radial-gradient(ellipse at 70% 70%, rgba(9,132,227,0.2) 0%, transparent 55%), radial-gradient(ellipse at 50% 100%, rgba(108,92,231,0.12) 0%, transparent 45%);
+        --theme-scrollbar:      rgba(0, 184, 148, 0.55);
+        --theme-badge:          #00b894;
+      }
+      html[data-active-theme="worldchampionship"] body {
+        background: var(--theme-gradient-hero);
+        color: var(--theme-text);
+      }
+      html[data-active-theme="worldchampionship"] body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: var(--theme-overlay);
+        pointer-events: none;
+        z-index: 0;
+      }
+      /* World Championship: scanline grid + energy pulse */
+      html[data-active-theme="worldchampionship"] body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0,184,148,0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,184,148,0.04) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+        z-index: 0;
+        animation: wc-grid-pulse 6s ease-in-out infinite;
+      }
+      @keyframes wc-grid-pulse {
+        0%,100% { opacity: 0.4; }
+        50%      { opacity: 1; }
+      }
+      html[data-active-theme="worldchampionship"] .card,
+      html[data-active-theme="worldchampionship"] .modal {
+        background: rgba(0, 14, 12, 0.88);
+        border-color: rgba(0, 184, 148, 0.35);
+        box-shadow:
+          0 0 28px rgba(0, 184, 148, 0.22),
+          0 0 70px rgba(9, 132, 227, 0.12),
+          0 8px 32px rgba(0,0,0,0.6),
+          inset 0 1px 0 rgba(0,184,148,0.12);
+        backdrop-filter: blur(24px);
+      }
+      html[data-active-theme="worldchampionship"] .btn-primary {
+        background: linear-gradient(135deg, #007a63, #00b894, #00d4a8);
+        box-shadow: 0 4px 20px rgba(0, 184, 148, 0.55), 0 0 40px rgba(0,184,148,0.22);
+        text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+      }
+      html[data-active-theme="worldchampionship"] .btn-primary:hover {
+        box-shadow: 0 8px 36px rgba(0, 184, 148, 0.75), 0 0 80px rgba(0,184,148,0.35);
+      }
+      .theme-event-banner[data-theme="worldchampionship"] {
+        background: linear-gradient(135deg, rgba(0,10,14,0.97), rgba(0,40,30,0.95));
+        border-bottom: 2px solid rgba(0,184,148,0.55);
+        box-shadow: 0 0 60px rgba(0,184,148,0.35), 0 4px 24px rgba(0,0,0,0.5);
+        text-shadow: 0 0 24px rgba(0,255,210,0.7), 0 0 48px rgba(0,184,148,0.5), 0 2px 8px rgba(0,0,0,0.6);
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         BONUS THEME: HALLOWEEN (Oct 28 – Nov 1)
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme="halloween"] {
+        --theme-primary:        #e67e22;
+        --theme-accent:         #8e44ad;
+        --theme-glow:           rgba(230, 126, 34, 0.6);
+        --theme-glow-soft:      rgba(142, 68, 173, 0.22);
+        --theme-text:           #fff5e6;
+        --theme-text-muted:     rgba(255, 245, 230, 0.55);
+        --theme-surface:        rgba(5, 0, 10, 0.97);
+        --theme-surface-glass:  rgba(230, 126, 34, 0.06);
+        --theme-border:         rgba(230, 126, 34, 0.28);
+        --theme-gradient-hero:  linear-gradient(160deg, #05000a 0%, #120008 50%, #0a0300 100%);
+        --theme-gradient-accent:linear-gradient(135deg, #e67e22, #8e44ad, #c0392b);
+        --theme-banner-bg:      url("https://pngtree.com/freebackground/spooky-halloween-night-scene-with-bats-full-moon-and-a-wooden-deck-illustration_16617673.html") center/cover no-repeat, linear-gradient(160deg,#05000a,#120008);
+        --theme-overlay:        radial-gradient(ellipse at 40% 20%, rgba(230,126,34,0.22) 0%, transparent 55%), radial-gradient(ellipse at 70% 75%, rgba(142,68,173,0.2) 0%, transparent 55%);
+        --theme-scrollbar:      rgba(230, 126, 34, 0.55);
+        --theme-badge:          #e67e22;
+      }
+      html[data-active-theme="halloween"] body {
+        background: var(--theme-gradient-hero);
+        color: var(--theme-text);
+      }
+      html[data-active-theme="halloween"] body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: var(--theme-overlay);
+        pointer-events: none;
+        z-index: 0;
+      }
+      html[data-active-theme="halloween"] body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(circle at 50% 50%, rgba(230,126,34,0.06) 0%, transparent 50%),
+          radial-gradient(circle at 20% 80%, rgba(142,68,173,0.08) 0%, transparent 40%);
+        pointer-events: none;
+        z-index: 0;
+        animation: halloween-flicker 3.5s ease-in-out infinite alternate;
+      }
+      @keyframes halloween-flicker {
+        0%   { opacity: 0.6; }
+        30%  { opacity: 1; }
+        60%  { opacity: 0.7; }
+        80%  { opacity: 0.95; }
+        100% { opacity: 0.65; }
+      }
+      html[data-active-theme="halloween"] .card,
+      html[data-active-theme="halloween"] .modal {
+        background: rgba(10, 2, 18, 0.88);
+        border-color: rgba(230, 126, 34, 0.32);
+        box-shadow:
+          0 0 28px rgba(230, 126, 34, 0.2),
+          0 0 60px rgba(142, 68, 173, 0.14),
+          0 8px 32px rgba(0,0,0,0.6);
+        backdrop-filter: blur(24px);
+      }
+      html[data-active-theme="halloween"] .btn-primary {
+        background: linear-gradient(135deg, #b5600a, #e67e22, #f39c12);
+        box-shadow: 0 4px 20px rgba(230, 126, 34, 0.55), 0 0 40px rgba(230,126,34,0.22);
+        text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+      }
+      html[data-active-theme="halloween"] .btn-primary:hover {
+        box-shadow: 0 8px 36px rgba(230, 126, 34, 0.75), 0 0 80px rgba(230,126,34,0.4);
+      }
+      .theme-event-banner[data-theme="halloween"] {
+        background: linear-gradient(135deg, rgba(5,0,10,0.97), rgba(20,5,30,0.97));
+        border-bottom: 2px solid rgba(230,126,34,0.5);
+        box-shadow: 0 0 55px rgba(230,126,34,0.3), 0 4px 24px rgba(0,0,0,0.5);
+        text-shadow: 0 0 22px rgba(255,140,0,0.75), 0 0 50px rgba(230,126,34,0.45), 0 2px 8px rgba(0,0,0,0.7);
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         BONUS THEME: VALENTINE'S (Feb 12 – Feb 15)
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme="valentines"] {
+        --theme-primary:        #e91e63;
+        --theme-accent:         #f48fb1;
+        --theme-glow:           rgba(233, 30, 99, 0.6);
+        --theme-glow-soft:      rgba(233, 30, 99, 0.2);
+        --theme-text:           #fff0f5;
+        --theme-text-muted:     rgba(255, 240, 245, 0.58);
+        --theme-surface:        rgba(12, 0, 6, 0.97);
+        --theme-surface-glass:  rgba(233, 30, 99, 0.06);
+        --theme-border:         rgba(233, 30, 99, 0.3);
+        --theme-gradient-hero:  linear-gradient(160deg, #0c0006 0%, #1a0010 50%, #0c0008 100%);
+        --theme-gradient-accent:linear-gradient(135deg, #e91e63, #f48fb1, #ce93d8);
+        --theme-banner-bg:      url("https://www.freepixel.com/graphics/valentines-day/valentines-day-heart-particles") center/cover no-repeat, linear-gradient(160deg,#0c0006,#1a0010);
+        --theme-overlay:        radial-gradient(ellipse at 35% 40%, rgba(233,30,99,0.25) 0%, transparent 55%), radial-gradient(ellipse at 70% 60%, rgba(244,143,177,0.15) 0%, transparent 50%);
+        --theme-scrollbar:      rgba(233, 30, 99, 0.55);
+        --theme-badge:          #e91e63;
+      }
+      html[data-active-theme="valentines"] body {
+        background: var(--theme-gradient-hero);
+        color: var(--theme-text);
+      }
+      html[data-active-theme="valentines"] body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: var(--theme-overlay);
+        pointer-events: none;
+        z-index: 0;
+      }
+      /* Valentine's: floating heart particles */
+      html[data-active-theme="valentines"] body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          radial-gradient(8px 7px at 15% 25%, rgba(233,30,99,0.5) 0%, transparent 100%),
+          radial-gradient(6px 5px at 40% 55%, rgba(244,143,177,0.4) 0%, transparent 100%),
+          radial-gradient(9px 8px at 65% 20%, rgba(233,30,99,0.35) 0%, transparent 100%),
+          radial-gradient(5px 4px at 82% 70%, rgba(244,143,177,0.45) 0%, transparent 100%),
+          radial-gradient(7px 6px at 55% 80%, rgba(233,30,99,0.3) 0%, transparent 100%);
+        background-size: 700px 700px;
+        pointer-events: none;
+        z-index: 0;
+        animation: valentines-float 10s ease-in-out infinite;
+        opacity: 0.7;
+      }
+      @keyframes valentines-float {
+        0%,100% { background-position: 0px 0px; }
+        50%      { background-position: 40px -60px; }
+      }
+      html[data-active-theme="valentines"] .card,
+      html[data-active-theme="valentines"] .modal {
+        background: rgba(16, 0, 8, 0.88);
+        border-color: rgba(233, 30, 99, 0.35);
+        box-shadow:
+          0 0 28px rgba(233, 30, 99, 0.22),
+          0 0 60px rgba(244, 143, 177, 0.1),
+          0 8px 32px rgba(0,0,0,0.6);
+        backdrop-filter: blur(24px);
+      }
+      html[data-active-theme="valentines"] .btn-primary {
+        background: linear-gradient(135deg, #ad1457, #e91e63, #f06292);
+        box-shadow: 0 4px 20px rgba(233, 30, 99, 0.55), 0 0 40px rgba(233,30,99,0.22);
+        text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+      }
+      html[data-active-theme="valentines"] .btn-primary:hover {
+        box-shadow: 0 8px 36px rgba(233, 30, 99, 0.75), 0 0 80px rgba(233,30,99,0.35);
+      }
+      .theme-event-banner[data-theme="valentines"] {
+        background: linear-gradient(135deg, rgba(12,0,6,0.97), rgba(26,0,16,0.97));
+        border-bottom: 2px solid rgba(233,30,99,0.5);
+        box-shadow: 0 0 55px rgba(233,30,99,0.3), 0 4px 24px rgba(0,0,0,0.5);
+        text-shadow: 0 0 22px rgba(255,100,160,0.75), 0 0 50px rgba(233,30,99,0.45), 0 2px 8px rgba(0,0,0,0.7);
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         SHARED: THEME EVENT BANNER COMPONENT
+         (Injected into DOM by the JS Engine — zero DOM modification needed)
+      ────────────────────────────────────────────────────────────────── */
+      #theme-event-banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 8999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 9px 24px;
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.04em;
+        pointer-events: none;
+        transition: all 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+        animation: banner-slide-in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      @keyframes banner-slide-in {
+        from { transform: translateY(-100%); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
+      }
+      #theme-event-banner .banner-icon {
+        font-size: 18px;
+        animation: banner-icon-pulse 2s ease-in-out infinite;
+        display: inline-block;
+      }
+      @keyframes banner-icon-pulse {
+        0%,100% { transform: scale(1) rotate(0deg); }
+        50%      { transform: scale(1.25) rotate(8deg); }
+      }
+      #theme-event-banner .banner-countdown {
+        font-size: 12px;
+        opacity: 0.8;
+        font-family: "Space Mono", monospace;
+        letter-spacing: 0.08em;
+        margin-left: 6px;
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         SHARED: PARTICLE CANVAS (JS-driven, behind all content)
+      ────────────────────────────────────────────────────────────────── */
+      #theme-particle-canvas {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0.6;
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         SHARED: GLOBAL SCROLLBAR THEMED OVERRIDE
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme]:not([data-active-theme="default"]) ::-webkit-scrollbar-thumb {
+        background: var(--theme-scrollbar, rgba(255,255,255,0.2));
+        box-shadow: 0 0 6px var(--theme-glow, transparent);
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         SHARED: GLOW TEXT UTILITY — applies to headings when themed
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme]:not([data-active-theme="default"]) h1,
+      html[data-active-theme]:not([data-active-theme="default"]) h2,
+      html[data-active-theme]:not([data-active-theme="default"]) .lang-logo {
+        text-shadow:
+          0 0 20px var(--theme-glow, transparent),
+          0 0 40px var(--theme-glow-soft, transparent);
+        transition: text-shadow 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         SHARED: INPUT FOCUS RING THEMED
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme]:not([data-active-theme="default"]) .input:focus {
+        border-color: var(--theme-primary, rgba(99,102,241,0.6));
+        box-shadow: 0 0 0 4px var(--theme-glow-soft, rgba(99,102,241,0.15)), 0 0 20px var(--theme-glow-soft, transparent);
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         SHARED: CARD GLOW THEMED
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme]:not([data-active-theme="default"]) .card-glow {
+        box-shadow: 0 0 40px var(--theme-glow-soft, rgba(99,102,241,0.1));
+      }
+
+      /* ──────────────────────────────────────────────────────────────────
+         SHARED: PAGE BODY PADDING WHEN BANNER IS PRESENT
+      ────────────────────────────────────────────────────────────────── */
+      html[data-active-theme]:not([data-active-theme="default"]) body {
+        padding-top: 40px;
+      }
     </style>
   </head>
   <body>
@@ -9976,6 +10611,1072 @@ Generate all ${numQ} questions. ALL text in ${S.langName}.`;
       .question-block{page-break-inside:avoid;}
       .answer-key{page-break-before:always;}
     }
+      css
+
+/*
+ * ═══════════════════════════════════════════════════════════════════════════════
+ *  LEARN-BETA — GLOBAL EVENT THEME ENGINE  ·  CSS VARIABLE & LAYOUT BLOCK v3.0
+ *  Authored by: Principal Frontend Engineer & Lead UI/UX Architect
+ *
+ *  PASTE THIS ENTIRE BLOCK inside the existing <style> tag in the <head>,
+ *  immediately AFTER the last existing rule (before </style>).
+ *  The data-active-theme attribute is set synchronously by theme-engine.js,
+ *  so no FOUC is possible.
+ *
+ *  ARCHITECTURE:
+ *   • html[data-active-theme="X"] CSS variable scoping — zero specificity clashes
+ *   • Master kinetic transition bound globally
+ *   • 10 fully-realized themes + premium default-corporate fallback
+ *   • Every ::before / ::after pseudo-element used for layered depth
+ *   • Hardware-accelerated transforms only (will-change: transform)
+ *   • Particle canvas styles
+ *   • Event banner styles
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
+
+/* ────────────────────────────────────────────────────────────────────────────
+   MASTER KINETIC TRANSITION  (hardware-accelerated on GPU compositor thread)
+   Applied to every meaningful visual surface — enables the cinematic morph
+   effect when themes switch at midnight or via the public API.
+────────────────────────────────────────────────────────────────────────────── */
+html, body,
+.card, .modal, .btn, .chip, .input, .toast,
+.lang-card, .auth-box,
+[class*="panel"],  [class*="header"],  [class*="sidebar"],
+[class*="content"],[class*="wrapper"], [class*="container"],
+[class*="section"],[class*="block"],   [class*="box"],
+.l-topbar, .t-sidebar, .t-main,
+.learner-hero, .subject-card, .game-card, .qa-card,
+.stat-card, .lb-row, .q-card, .quiz-q-wrap,
+#theme-event-banner,
+#theme-particle-canvas {
+  will-change: background-color, background, box-shadow, color, border-color, text-shadow, opacity;
+  transition:
+    background-color 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+    background       0.9s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color     0.9s cubic-bezier(0.25, 1, 0.5, 1),
+    color            0.9s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow       0.9s cubic-bezier(0.25, 1, 0.5, 1),
+    text-shadow      0.9s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity          0.9s cubic-bezier(0.25, 1, 0.5, 1),
+    transform        0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   PARTICLE CANVAS  —  always behind all UI, never intercepts pointer events
+────────────────────────────────────────────────────────────────────────────── */
+#theme-particle-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.72;
+  mix-blend-mode: screen;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   EVENT BANNER  —  shared base, theme-specific overrides follow per-theme
+────────────────────────────────────────────────────────────────────────────── */
+#theme-event-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 8999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 9px 24px;
+  font-family: "Syne", sans-serif;
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.045em;
+  pointer-events: none;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: bannerSlideIn 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes bannerSlideIn {
+  from { transform: translateY(-110%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+#theme-event-banner .banner-icon {
+  font-size: 17px;
+  display: inline-block;
+  animation: bannerIconBounce 2.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+@keyframes bannerIconBounce {
+  0%, 100% { transform: scale(1)    rotate(0deg);  }
+  40%       { transform: scale(1.3)  rotate(-8deg); }
+  60%       { transform: scale(1.15) rotate(5deg);  }
+}
+
+#theme-event-banner .banner-label {
+  flex: 1;
+  text-align: center;
+  line-height: 1.35;
+}
+
+#theme-event-banner .banner-countdown {
+  font-family: "Space Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* Body top-padding when banner is visible (non-default themes) */
+html[data-active-theme]:not([data-active-theme="default"]) body {
+  padding-top: 40px;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   SHARED GLOW UTILITY  —  themed headings glow in their event color
+────────────────────────────────────────────────────────────────────────────── */
+html[data-active-theme]:not([data-active-theme="default"]) h1,
+html[data-active-theme]:not([data-active-theme="default"]) h2,
+html[data-active-theme]:not([data-active-theme="default"]) .lang-logo,
+html[data-active-theme]:not([data-active-theme="default"]) .hero-logo {
+  text-shadow:
+    0 0 22px var(--theme-glow, transparent),
+    0 0 44px var(--theme-glow-soft, transparent),
+    0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Themed scrollbar thumb */
+html[data-active-theme]:not([data-active-theme="default"]) ::-webkit-scrollbar-thumb {
+  background: var(--theme-scrollbar, rgba(255,255,255,0.2));
+  box-shadow: 0 0 6px var(--theme-glow, transparent);
+}
+
+/* Themed input focus ring */
+html[data-active-theme]:not([data-active-theme="default"]) .input:focus {
+  border-color: var(--theme-primary, rgba(99,102,241,0.6));
+  box-shadow:
+    0 0 0 4px var(--theme-glow-soft, rgba(99,102,241,0.15)),
+    0 0 20px var(--theme-glow-soft, transparent);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: DEFAULT CORPORATE  (fallback — no active event)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="default"] {
+  --theme-primary:          #6366f1;
+  --theme-accent:           #8b5cf6;
+  --theme-glow:             rgba(99,102,241,0.48);
+  --theme-glow-soft:        rgba(99,102,241,0.18);
+  --theme-text:             #e2e8f0;
+  --theme-text-muted:       rgba(226,232,240,0.55);
+  --theme-surface:          rgba(17,17,30,0.97);
+  --theme-surface-glass:    rgba(255,255,255,0.045);
+  --theme-border:           rgba(255,255,255,0.09);
+  --theme-gradient-hero:    linear-gradient(135deg, #0a0a0f 0%, #111127 50%, #0d0d1e 100%);
+  --theme-gradient-accent:  linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+  --theme-banner-bg:        url("IMAGE_DEFAULT_CORPORATE_HERO_BANNER") center/cover no-repeat, linear-gradient(135deg,#0a0a0f,#111127);
+  --theme-overlay:          radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.22) 0%, transparent 60%),
+                            radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.15) 0%, transparent 60%);
+  --theme-scrollbar:        rgba(99,102,241,0.4);
+  --theme-badge:            #6366f1;
+}
+
+html[data-active-theme="default"] body {
+  background: var(--theme-gradient-hero);
+  color: var(--theme-text);
+}
+html[data-active-theme="default"] body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: LEARN-BETA ANNIVERSARY  (July 5 – July 7)
+   Concept: cosmic gold & violet celebration — fireworks + galaxy depth.
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="anniversary"] {
+  --theme-primary:         #ffd700;
+  --theme-accent:          #c084fc;
+  --theme-glow:            rgba(255,215,0,0.7);
+  --theme-glow-soft:       rgba(192,132,252,0.28);
+  --theme-text:            #fff9e6;
+  --theme-text-muted:      rgba(255,249,230,0.62);
+  --theme-surface:         rgba(5,2,18,0.97);
+  --theme-surface-glass:   rgba(255,215,0,0.07);
+  --theme-border:          rgba(255,215,0,0.35);
+  --theme-gradient-hero:   linear-gradient(160deg, #030010 0%, #0d0028 40%, #150020 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #ffd700, #c084fc, #f472b6, #fbbf24);
+  --theme-banner-bg:       url("https://www.magnific.com/free-photos-vectors/anniversary-celebration") center/cover no-repeat,
+                           linear-gradient(160deg,#030010,#0d0028);
+  --theme-overlay:         radial-gradient(ellipse at 50% 0%,   rgba(255,215,0,0.35)   0%, transparent 55%),
+                           radial-gradient(ellipse at 20% 60%,  rgba(192,132,252,0.25) 0%, transparent 55%),
+                           radial-gradient(ellipse at 80% 80%,  rgba(244,114,182,0.18) 0%, transparent 50%);
+  --theme-scrollbar:       rgba(255,215,0,0.55);
+  --theme-badge:           #ffd700;
+}
+
+html[data-active-theme="anniversary"] body {
+  background: var(--theme-gradient-hero);
+  color: var(--theme-text);
+}
+html[data-active-theme="anniversary"] body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+/* Rotating conic shimmer ring */
+html[data-active-theme="anniversary"] body::after {
+  content: "";
+  position: fixed; inset: 0;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255,215,0,0.06) 0deg,
+    transparent 60deg,
+    rgba(192,132,252,0.05) 120deg,
+    transparent 180deg,
+    rgba(244,114,182,0.04) 240deg,
+    transparent 300deg,
+    rgba(255,215,0,0.06) 360deg
+  );
+  pointer-events: none; z-index: 0;
+  animation: anniversarySpinRing 18s linear infinite;
+  transform-origin: center;
+}
+@keyframes anniversarySpinRing {
+  0%   { transform: scale(2.8) rotate(0deg); }
+  100% { transform: scale(2.8) rotate(360deg); }
+}
+
+/* Card & modal overrides */
+html[data-active-theme="anniversary"] .card,
+html[data-active-theme="anniversary"] .modal,
+html[data-active-theme="anniversary"] .auth-box {
+  background: rgba(10, 4, 30, 0.88);
+  border-color: rgba(255,215,0,0.32);
+  box-shadow:
+    0 0 0 1px rgba(255,215,0,0.12),
+    0 0 40px rgba(255,215,0,0.22),
+    0 0 80px rgba(192,132,252,0.12),
+    0 12px 40px rgba(0,0,0,0.65),
+    inset 0 1px 0 rgba(255,215,0,0.1);
+  backdrop-filter: blur(28px);
+}
+
+/* Primary button */
+html[data-active-theme="anniversary"] .btn-primary {
+  background: linear-gradient(135deg, #c9a200, #ffd700, #f0c020);
+  color: #050010;
+  font-weight: 800;
+  box-shadow: 0 4px 24px rgba(255,215,0,0.55), 0 0 50px rgba(255,215,0,0.25);
+  text-shadow: none;
+}
+html[data-active-theme="anniversary"] .btn-primary:hover {
+  box-shadow: 0 8px 40px rgba(255,215,0,0.75), 0 0 80px rgba(255,215,0,0.38);
+  transform: translateY(-3px) scale(1.02);
+}
+
+/* Banner */
+#theme-event-banner[data-theme="anniversary"] {
+  background: linear-gradient(
+    90deg,
+    rgba(5,2,18,0.97) 0%,
+    rgba(25,5,55,0.97) 35%,
+    rgba(20,2,40,0.97) 65%,
+    rgba(5,2,18,0.97) 100%
+  );
+  border-bottom: 2px solid rgba(255,215,0,0.55);
+  box-shadow:
+    0 0 60px rgba(255,215,0,0.35),
+    0 0 120px rgba(192,132,252,0.18),
+    0 4px 24px rgba(0,0,0,0.5);
+  color: #ffd700;
+  text-shadow:
+    0 0 30px rgba(255,215,0,0.9),
+    0 0 60px rgba(255,215,0,0.5),
+    0 0 100px rgba(192,132,252,0.4),
+    0 2px 8px rgba(0,0,0,0.7);
+  animation: bannerSlideIn 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+             anniversaryBannerPulse 3.5s ease-in-out infinite;
+}
+@keyframes anniversaryBannerPulse {
+  0%,100% { border-bottom-color: rgba(255,215,0,0.55); }
+  50%     { border-bottom-color: rgba(192,132,252,0.7); }
+}
+
+/* Milestone number badge shown inline */
+html[data-active-theme="anniversary"] .hero-logo,
+html[data-active-theme="anniversary"] .t-sidebar-logo,
+html[data-active-theme="anniversary"] .lang-logo {
+  background: linear-gradient(135deg, #ffd700, #c084fc, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: anniversaryLogoShift 4s ease-in-out infinite;
+}
+@keyframes anniversaryLogoShift {
+  0%,100% { background-position: 0%   50%; }
+  50%     { background-position: 100% 50%; }
+}
+
+/* Stat cards: gold shimmer border animation */
+html[data-active-theme="anniversary"] .stat-card {
+  border-color: rgba(255,215,0,0.22);
+  background: rgba(12,6,32,0.85);
+  animation: anniversaryCardGlow 4s ease-in-out infinite alternate;
+}
+@keyframes anniversaryCardGlow {
+  0%   { box-shadow: 0 0 12px rgba(255,215,0,0.12), 0 4px 20px rgba(0,0,0,0.4); }
+  100% { box-shadow: 0 0 28px rgba(255,215,0,0.28), 0 8px 32px rgba(192,132,252,0.15); }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: CHRISTMAS  (Dec 20 – Dec 27)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="christmas"] {
+  --theme-primary:         #c0392b;
+  --theme-accent:          #27ae60;
+  --theme-glow:            rgba(192,57,43,0.62);
+  --theme-glow-soft:       rgba(39,174,96,0.22);
+  --theme-text:            #fef9f0;
+  --theme-text-muted:      rgba(254,249,240,0.6);
+  --theme-surface:         rgba(12,28,12,0.97);
+  --theme-surface-glass:   rgba(255,255,255,0.055);
+  --theme-border:          rgba(192,57,43,0.3);
+  --theme-gradient-hero:   linear-gradient(160deg, #0c1c0c 0%, #1a0a08 40%, #0e1e0e 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #c0392b, #e74c3c, #27ae60);
+  --theme-banner-bg:       url("https://www.vecteezy.com/free-vector/elegant-christmas-background") center/cover no-repeat,
+                           linear-gradient(160deg,#0c1c0c,#1a0808);
+  --theme-overlay:         radial-gradient(ellipse at 15% 40%, rgba(192,57,43,0.28) 0%, transparent 55%),
+                           radial-gradient(ellipse at 85% 20%, rgba(39,174,96,0.18) 0%, transparent 55%),
+                           radial-gradient(ellipse at 50% 90%, rgba(192,57,43,0.14) 0%, transparent 50%);
+  --theme-scrollbar:       rgba(192,57,43,0.55);
+  --theme-badge:           #c0392b;
+}
+
+html[data-active-theme="christmas"] body {
+  background: var(--theme-gradient-hero);
+  color: var(--theme-text);
+}
+html[data-active-theme="christmas"] body::before {
+  content: ""; position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+/* Subtle snow depth layer (CSS only — particle canvas does the main snow) */
+html[data-active-theme="christmas"] body::after {
+  content: ""; position: fixed; inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 12% 22%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(2px 2px at 33% 11%, rgba(255,255,255,0.7)  0%, transparent 100%),
+    radial-gradient(3px 3px at 54% 38%, rgba(255,255,255,0.8)  0%, transparent 100%),
+    radial-gradient(2px 2px at 72% 17%, rgba(255,255,255,0.6)  0%, transparent 100%),
+    radial-gradient(2px 2px at 91% 29%, rgba(255,255,255,0.75) 0%, transparent 100%),
+    radial-gradient(1px 1px at 21% 62%, rgba(255,255,255,0.5)  0%, transparent 100%),
+    radial-gradient(2px 2px at 46% 71%, rgba(255,255,255,0.65) 0%, transparent 100%),
+    radial-gradient(1px 1px at 67% 83%, rgba(255,255,255,0.55) 0%, transparent 100%),
+    radial-gradient(2px 2px at 82% 57%, rgba(255,255,255,0.7)  0%, transparent 100%),
+    radial-gradient(3px 3px at 37% 93%, rgba(255,255,255,0.6)  0%, transparent 100%);
+  background-size: 500px 500px;
+  pointer-events: none; z-index: 0;
+  animation: christmasSnowDrift 16s linear infinite;
+  opacity: 0.5;
+}
+@keyframes christmasSnowDrift {
+  0%   { background-position: 0px 0px; }
+  100% { background-position: 80px 500px; }
+}
+
+html[data-active-theme="christmas"] .card,
+html[data-active-theme="christmas"] .modal,
+html[data-active-theme="christmas"] .auth-box {
+  background: rgba(15,32,15,0.88);
+  border-color: rgba(192,57,43,0.32);
+  box-shadow:
+    0 0 32px rgba(192,57,43,0.18),
+    0 0 80px rgba(39,174,96,0.1),
+    0 8px 32px rgba(0,0,0,0.55);
+  backdrop-filter: blur(24px);
+}
+html[data-active-theme="christmas"] .btn-primary {
+  background: linear-gradient(135deg, #9a1e1e, #c0392b, #e74c3c);
+  box-shadow: 0 4px 22px rgba(192,57,43,0.52), 0 0 44px rgba(192,57,43,0.22);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.45);
+}
+html[data-active-theme="christmas"] .btn-primary:hover {
+  box-shadow: 0 8px 38px rgba(192,57,43,0.72), 0 0 65px rgba(192,57,43,0.3);
+  transform: translateY(-3px);
+}
+#theme-event-banner[data-theme="christmas"] {
+  background: linear-gradient(135deg, rgba(12,28,12,0.97), rgba(26,10,8,0.97));
+  border-bottom: 2px solid rgba(192,57,43,0.5);
+  box-shadow: 0 0 45px rgba(192,57,43,0.32), 0 4px 24px rgba(0,0,0,0.5);
+  color: #fef9f0;
+  text-shadow:
+    0 0 18px rgba(255,120,80,0.75),
+    0 0 40px rgba(39,174,96,0.35),
+    0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: NEW YEAR GALA  (Dec 31 – Jan 3)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="newyear"] {
+  --theme-primary:         #f1c40f;
+  --theme-accent:          #e67e22;
+  --theme-glow:            rgba(241,196,15,0.68);
+  --theme-glow-soft:       rgba(241,196,15,0.24);
+  --theme-text:            #fffbef;
+  --theme-text-muted:      rgba(255,251,239,0.58);
+  --theme-surface:         rgba(10,8,2,0.97);
+  --theme-surface-glass:   rgba(241,196,15,0.06);
+  --theme-border:          rgba(241,196,15,0.32);
+  --theme-gradient-hero:   linear-gradient(160deg, #0a0800 0%, #1a1200 50%, #0d0a00 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #f1c40f, #e67e22, #e74c3c, #9b59b6);
+  --theme-banner-bg:       url("https://www.freepik.com/photos/new-year-midnight-skyline") center/cover no-repeat,
+                           url(https://www.shutterstock.com/image-vector/gold-glitter-confetti-background-happy-new-337762403") center/cover no-repeat,
+                           linear-gradient(160deg,#0a0800,#1a1200);
+  --theme-overlay:         radial-gradient(ellipse at 50% 0%,   rgba(241,196,15,0.32) 0%, transparent 60%),
+                           radial-gradient(ellipse at 20% 80%,  rgba(230,126,34,0.2)  0%, transparent 55%),
+                           radial-gradient(ellipse at 80% 60%,  rgba(155,89,182,0.15) 0%, transparent 50%);
+  --theme-scrollbar:       rgba(241,196,15,0.55);
+  --theme-badge:           #f1c40f;
+}
+
+html[data-active-theme="newyear"] body {
+  background: var(--theme-gradient-hero);
+  color: var(--theme-text);
+}
+html[data-active-theme="newyear"] body::before {
+  content: ""; position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+/* Gold shimmer sweep */
+html[data-active-theme="newyear"] body::after {
+  content: ""; position: fixed; inset: 0;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(241,196,15,0.05) 0deg,   transparent 60deg,
+    rgba(241,196,15,0.07) 120deg, transparent 180deg,
+    rgba(230,126,34,0.04) 240deg, transparent 300deg,
+    rgba(241,196,15,0.05) 360deg
+  );
+  pointer-events: none; z-index: 0;
+  animation: newyearGoldSpin 10s linear infinite;
+}
+@keyframes newyearGoldSpin {
+  0%   { transform: scale(2.8) rotate(0deg);   opacity: 0.7; }
+  100% { transform: scale(2.8) rotate(360deg); opacity: 0.7; }
+}
+
+html[data-active-theme="newyear"] .card,
+html[data-active-theme="newyear"] .modal,
+html[data-active-theme="newyear"] .auth-box {
+  background: rgba(20,16,0,0.88);
+  border-color: rgba(241,196,15,0.35);
+  box-shadow:
+    0 0 34px rgba(241,196,15,0.22),
+    0 0 80px rgba(230,126,34,0.1),
+    0 8px 32px rgba(0,0,0,0.62);
+  backdrop-filter: blur(24px);
+}
+html[data-active-theme="newyear"] .btn-primary {
+  background: linear-gradient(135deg, #c9a200, #f1c40f, #f7d914);
+  color: #0a0800;
+  font-weight: 800;
+  box-shadow: 0 4px 22px rgba(241,196,15,0.52), 0 0 44px rgba(241,196,15,0.26);
+}
+html[data-active-theme="newyear"] .btn-primary:hover {
+  box-shadow: 0 8px 40px rgba(241,196,15,0.78), 0 0 75px rgba(241,196,15,0.36);
+  transform: translateY(-3px);
+}
+#theme-event-banner[data-theme="newyear"] {
+  background: linear-gradient(135deg, rgba(10,8,0,0.97), rgba(30,22,0,0.97));
+  border-bottom: 2px solid rgba(241,196,15,0.58);
+  box-shadow:
+    0 0 50px rgba(241,196,15,0.32),
+    0 4px 24px rgba(0,0,0,0.5);
+  color: #f1c40f;
+  text-shadow:
+    0 0 28px rgba(241,196,15,0.9),
+    0 0 55px rgba(241,196,15,0.45),
+    0 2px 8px rgba(0,0,0,0.65);
+  animation: bannerSlideIn 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+             newyearBannerFlicker 5s ease-in-out infinite;
+}
+@keyframes newyearBannerFlicker {
+  0%,100% { box-shadow: 0 0 50px rgba(241,196,15,0.32), 0 4px 24px rgba(0,0,0,0.5); }
+  50%     { box-shadow: 0 0 80px rgba(241,196,15,0.5),  0 4px 24px rgba(0,0,0,0.5); }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: INDEPENDENCE CELEBRATION  (July 3 – July 5)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="independence"] {
+  --theme-primary:         #b22234;
+  --theme-accent:          #3c3b6e;
+  --theme-glow:            rgba(178,34,52,0.62);
+  --theme-glow-soft:       rgba(60,59,110,0.25);
+  --theme-text:            #f0f4ff;
+  --theme-text-muted:      rgba(240,244,255,0.58);
+  --theme-surface:         rgba(6,6,20,0.97);
+  --theme-surface-glass:   rgba(60,59,110,0.07);
+  --theme-border:          rgba(178,34,52,0.32);
+  --theme-gradient-hero:   linear-gradient(160deg, #060614 0%, #0d0d28 50%, #14060a 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #b22234, #ffffff, #3c3b6e);
+  --theme-banner-bg:       url("https://www.shutterstock.com/search/all-countries") center/cover no-repeat,
+                           linear-gradient(160deg,#060614,#0d0d28);
+  --theme-overlay:         radial-gradient(ellipse at 25% 35%, rgba(178,34,52,0.25)  0%, transparent 55%),
+                           radial-gradient(ellipse at 75% 65%, rgba(60,59,110,0.22)  0%, transparent 55%),
+                           radial-gradient(ellipse at 50% 10%, rgba(255,255,255,0.06) 0%, transparent 40%);
+  --theme-scrollbar:       rgba(178,34,52,0.55);
+  --theme-badge:           #b22234;
+}
+
+html[data-active-theme="independence"] body {
+  background: var(--theme-gradient-hero);
+  color: var(--theme-text);
+}
+html[data-active-theme="independence"] body::before {
+  content: ""; position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+/* Star-field layer */
+html[data-active-theme="independence"] body::after {
+  content: ""; position: fixed; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 5%  15%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 18% 38%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 33% 9%,  rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 49% 24%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 63% 44%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(2px 2px at 76% 13%, rgba(255,255,255,0.75)0%, transparent 100%),
+    radial-gradient(1px 1px at 89% 31%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 14% 67%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 57% 72%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 93% 59%, rgba(255,255,255,0.65)0%, transparent 100%);
+  background-size: 600px 600px;
+  pointer-events: none; z-index: 0;
+  animation: independenceStarfield 25s linear infinite;
+  opacity: 0.65;
+}
+@keyframes independenceStarfield {
+  0%   { background-position: 0px 0px; opacity: 0.5; }
+  50%  { opacity: 0.85; }
+  100% { background-position: 600px 120px; opacity: 0.5; }
+}
+
+html[data-active-theme="independence"] .card,
+html[data-active-theme="independence"] .modal,
+html[data-active-theme="independence"] .auth-box {
+  background: rgba(8,8,24,0.88);
+  border-color: rgba(178,34,52,0.38);
+  box-shadow:
+    0 0 30px rgba(178,34,52,0.2),
+    0 0 65px rgba(60,59,110,0.15),
+    0 8px 32px rgba(0,0,0,0.58);
+  backdrop-filter: blur(24px);
+}
+html[data-active-theme="independence"] .btn-primary {
+  background: linear-gradient(135deg, #8b0000, #b22234, #dc2c46);
+  box-shadow: 0 4px 22px rgba(178,34,52,0.57), 0 0 44px rgba(178,34,52,0.22);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.45);
+}
+html[data-active-theme="independence"] .btn-primary:hover {
+  box-shadow: 0 8px 38px rgba(178,34,52,0.78), 0 0 72px rgba(178,34,52,0.35);
+  transform: translateY(-3px);
+}
+#theme-event-banner[data-theme="independence"] {
+  background: linear-gradient(90deg, rgba(178,34,52,0.97) 0%, rgba(60,59,110,0.95) 50%, rgba(178,34,52,0.97) 100%);
+  border-bottom: 2px solid rgba(178,34,52,0.55);
+  box-shadow: 0 0 55px rgba(178,34,52,0.38), 0 4px 24px rgba(0,0,0,0.5);
+  color: #ffffff;
+  text-shadow:
+    0 0 22px rgba(255,255,255,0.65),
+    0 0 44px rgba(255,255,255,0.3),
+    0 2px 8px rgba(0,0,0,0.65);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: WORLD CHAMPIONSHIP  (June 1 – July 15)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="worldchampionship"] {
+  --theme-primary:         #00b894;
+  --theme-accent:          #0984e3;
+  --theme-glow:            rgba(0,184,148,0.62);
+  --theme-glow-soft:       rgba(9,132,227,0.22);
+  --theme-text:            #edfffe;
+  --theme-text-muted:      rgba(237,255,254,0.58);
+  --theme-surface:         rgba(0,10,14,0.97);
+  --theme-surface-glass:   rgba(0,184,148,0.06);
+  --theme-border:          rgba(0,184,148,0.3);
+  --theme-gradient-hero:   linear-gradient(160deg, #00060a 0%, #001a1a 50%, #000a06 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #00b894, #0984e3, #6c5ce7, #fdcb6e);
+  --theme-banner-bg:       url("https://www.sportingnews.com/in/football/news/clubs-most-players-world-cup-2026-list-teams/cf233bf3a1b0389b3250e058") center/cover no-repeat,
+                           linear-gradient(160deg,#00060a,#001a14);
+  --theme-overlay:         radial-gradient(ellipse at 30% 30%, rgba(0,184,148,0.25)  0%, transparent 55%),
+                           radial-gradient(ellipse at 70% 70%, rgba(9,132,227,0.2)   0%, transparent 55%),
+                           radial-gradient(ellipse at 50% 100%,rgba(108,92,231,0.12) 0%, transparent 45%);
+  --theme-scrollbar:       rgba(0,184,148,0.55);
+  --theme-badge:           #00b894;
+}
+
+html[data-active-theme="worldchampionship"] body {
+  background: var(--theme-gradient-hero);
+  color: var(--theme-text);
+}
+html[data-active-theme="worldchampionship"] body::before {
+  content: ""; position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+/* Stadium scanline grid energy */
+html[data-active-theme="worldchampionship"] body::after {
+  content: ""; position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,184,148,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,184,148,0.045) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+  animation: wcGridPulse 7s ease-in-out infinite;
+}
+@keyframes wcGridPulse {
+  0%,100% { opacity: 0.4; }
+  50%     { opacity: 1; }
+}
+
+html[data-active-theme="worldchampionship"] .card,
+html[data-active-theme="worldchampionship"] .modal,
+html[data-active-theme="worldchampionship"] .auth-box {
+  background: rgba(0,14,12,0.88);
+  border-color: rgba(0,184,148,0.35);
+  box-shadow:
+    0 0 30px rgba(0,184,148,0.22),
+    0 0 72px rgba(9,132,227,0.12),
+    0 8px 32px rgba(0,0,0,0.62),
+    inset 0 1px 0 rgba(0,184,148,0.12);
+  backdrop-filter: blur(24px);
+}
+html[data-active-theme="worldchampionship"] .btn-primary {
+  background: linear-gradient(135deg, #007a63, #00b894, #00d4a8);
+  box-shadow: 0 4px 22px rgba(0,184,148,0.57), 0 0 44px rgba(0,184,148,0.22);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+}
+html[data-active-theme="worldchampionship"] .btn-primary:hover {
+  box-shadow: 0 8px 38px rgba(0,184,148,0.78), 0 0 82px rgba(0,184,148,0.35);
+  transform: translateY(-3px);
+}
+#theme-event-banner[data-theme="worldchampionship"] {
+  background: linear-gradient(135deg, rgba(0,10,14,0.97), rgba(0,40,30,0.97));
+  border-bottom: 2px solid rgba(0,184,148,0.55);
+  box-shadow: 0 0 65px rgba(0,184,148,0.38), 0 4px 24px rgba(0,0,0,0.5);
+  color: #edfffe;
+  text-shadow:
+    0 0 26px rgba(0,255,210,0.72),
+    0 0 52px rgba(0,184,148,0.5),
+    0 2px 8px rgba(0,0,0,0.65);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: HALLOWEEN  (Oct 28 – Nov 1)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="halloween"] {
+  --theme-primary:         #e67e22;
+  --theme-accent:          #8e44ad;
+  --theme-glow:            rgba(230,126,34,0.62);
+  --theme-glow-soft:       rgba(142,68,173,0.24);
+  --theme-text:            #fff5e6;
+  --theme-text-muted:      rgba(255,245,230,0.55);
+  --theme-surface:         rgba(5,0,10,0.97);
+  --theme-surface-glass:   rgba(230,126,34,0.06);
+  --theme-border:          rgba(230,126,34,0.28);
+  --theme-gradient-hero:   linear-gradient(160deg, #05000a 0%, #120008 50%, #0a0300 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #e67e22, #8e44ad, #c0392b);
+  --theme-banner-bg:       url("https://www.shutterstock.com/search/spooky-halloween-background") center/cover no-repeat,
+                           linear-gradient(160deg,#05000a,#120008);
+  --theme-overlay:         radial-gradient(ellipse at 40% 20%, rgba(230,126,34,0.22) 0%, transparent 55%),
+                           radial-gradient(ellipse at 70% 75%, rgba(142,68,173,0.2)  0%, transparent 55%);
+  --theme-scrollbar:       rgba(230,126,34,0.55);
+  --theme-badge:           #e67e22;
+}
+html[data-active-theme="halloween"] body {
+  background: var(--theme-gradient-hero); color: var(--theme-text);
+}
+html[data-active-theme="halloween"] body::before {
+  content: ""; position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+html[data-active-theme="halloween"] body::after {
+  content: ""; position: fixed; inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(230,126,34,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(142,68,173,0.08) 0%, transparent 40%);
+  pointer-events: none; z-index: 0;
+  animation: halloweenFlicker 3.8s ease-in-out infinite alternate;
+}
+@keyframes halloweenFlicker {
+  0%   { opacity: 0.6; }
+  30%  { opacity: 1; }
+  60%  { opacity: 0.65; }
+  80%  { opacity: 0.95; }
+  100% { opacity: 0.6; }
+}
+html[data-active-theme="halloween"] .card,
+html[data-active-theme="halloween"] .modal,
+html[data-active-theme="halloween"] .auth-box {
+  background: rgba(10,2,18,0.88);
+  border-color: rgba(230,126,34,0.32);
+  box-shadow:
+    0 0 30px rgba(230,126,34,0.2),
+    0 0 65px rgba(142,68,173,0.14),
+    0 8px 32px rgba(0,0,0,0.62);
+  backdrop-filter: blur(24px);
+}
+html[data-active-theme="halloween"] .btn-primary {
+  background: linear-gradient(135deg, #b5600a, #e67e22, #f39c12);
+  box-shadow: 0 4px 22px rgba(230,126,34,0.57), 0 0 44px rgba(230,126,34,0.24);
+}
+html[data-active-theme="halloween"] .btn-primary:hover {
+  box-shadow: 0 8px 38px rgba(230,126,34,0.78), 0 0 82px rgba(230,126,34,0.4);
+  transform: translateY(-3px);
+}
+#theme-event-banner[data-theme="halloween"] {
+  background: linear-gradient(135deg, rgba(5,0,10,0.97), rgba(20,5,30,0.97));
+  border-bottom: 2px solid rgba(230,126,34,0.5);
+  box-shadow: 0 0 58px rgba(230,126,34,0.3), 0 4px 24px rgba(0,0,0,0.5);
+  color: #fff5e6;
+  text-shadow:
+    0 0 24px rgba(255,140,0,0.78),
+    0 0 50px rgba(230,126,34,0.45),
+    0 2px 8px rgba(0,0,0,0.72);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: VALENTINE'S  (Feb 12 – Feb 15)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="valentines"] {
+  --theme-primary:         #e91e63;
+  --theme-accent:          #f48fb1;
+  --theme-glow:            rgba(233,30,99,0.62);
+  --theme-glow-soft:       rgba(233,30,99,0.22);
+  --theme-text:            #fff0f5;
+  --theme-text-muted:      rgba(255,240,245,0.58);
+  --theme-surface:         rgba(12,0,6,0.97);
+  --theme-surface-glass:   rgba(233,30,99,0.06);
+  --theme-border:          rgba(233,30,99,0.3);
+  --theme-gradient-hero:   linear-gradient(160deg, #0c0006 0%, #1a0010 50%, #0c0008 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #e91e63, #f48fb1, #ce93d8);
+  --theme-banner-bg:       url("https://www.vecteezy.com/photo/55612322-roses-and-heart-on-red-glittering-bokeh-background-valentines-day") center/cover no-repeat,
+                           linear-gradient(160deg,#0c0006,#1a0010);
+  --theme-overlay:         radial-gradient(ellipse at 35% 40%, rgba(233,30,99,0.25)  0%, transparent 55%),
+                           radial-gradient(ellipse at 70% 60%, rgba(244,143,177,0.15) 0%, transparent 50%);
+  --theme-scrollbar:       rgba(233,30,99,0.55);
+  --theme-badge:           #e91e63;
+}
+html[data-active-theme="valentines"] body {
+  background: var(--theme-gradient-hero); color: var(--theme-text);
+}
+html[data-active-theme="valentines"] body::before {
+  content: ""; position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+html[data-active-theme="valentines"] .card,
+html[data-active-theme="valentines"] .modal,
+html[data-active-theme="valentines"] .auth-box {
+  background: rgba(16,0,8,0.88);
+  border-color: rgba(233,30,99,0.35);
+  box-shadow:
+    0 0 30px rgba(233,30,99,0.22),
+    0 0 65px rgba(244,143,177,0.1),
+    0 8px 32px rgba(0,0,0,0.62);
+  backdrop-filter: blur(24px);
+}
+html[data-active-theme="valentines"] .btn-primary {
+  background: linear-gradient(135deg, #ad1457, #e91e63, #f06292);
+  box-shadow: 0 4px 22px rgba(233,30,99,0.57), 0 0 44px rgba(233,30,99,0.24);
+}
+html[data-active-theme="valentines"] .btn-primary:hover {
+  box-shadow: 0 8px 38px rgba(233,30,99,0.78), 0 0 82px rgba(233,30,99,0.36);
+  transform: translateY(-3px);
+}
+#theme-event-banner[data-theme="valentines"] {
+  background: linear-gradient(135deg, rgba(12,0,6,0.97), rgba(26,0,16,0.97));
+  border-bottom: 2px solid rgba(233,30,99,0.5);
+  box-shadow: 0 0 58px rgba(233,30,99,0.32), 0 4px 24px rgba(0,0,0,0.5);
+  color: #fff0f5;
+  text-shadow:
+    0 0 24px rgba(255,100,160,0.78),
+    0 0 50px rgba(233,30,99,0.45),
+    0 2px 8px rgba(0,0,0,0.7);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: EASTER / SPRING LEARNING FESTIVAL  (Apr 17 – Apr 22)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="easter"] {
+  --theme-primary:         #7ecba1;
+  --theme-accent:          #f8c8d4;
+  --theme-glow:            rgba(126,203,161,0.55);
+  --theme-glow-soft:       rgba(248,200,212,0.25);
+  --theme-text:            #1a2e1e;
+  --theme-text-muted:      rgba(26,46,30,0.62);
+  --theme-surface:         rgba(245,252,248,0.97);
+  --theme-surface-glass:   rgba(255,255,255,0.6);
+  --theme-border:          rgba(126,203,161,0.3);
+  --theme-gradient-hero:   linear-gradient(160deg, #f0faf3 0%, #fce4ec 50%, #f0faf3 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #7ecba1, #f8c8d4, #ffe082);
+  --theme-banner-bg:       url("https://pngtree.com/free-backgrounds-photos/spring-easter") center/cover no-repeat,
+                           linear-gradient(160deg,#f0faf3,#fce4ec);
+  --theme-overlay:         radial-gradient(ellipse at 30% 30%, rgba(126,203,161,0.25) 0%, transparent 60%),
+                           radial-gradient(ellipse at 70% 70%, rgba(248,200,212,0.3)  0%, transparent 60%);
+  --theme-scrollbar:       rgba(126,203,161,0.5);
+  --theme-badge:           #7ecba1;
+}
+html[data-active-theme="easter"] body {
+  background: var(--theme-gradient-hero); color: var(--theme-text);
+}
+html[data-active-theme="easter"] body::before {
+  content: ""; position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+html[data-active-theme="easter"] .card,
+html[data-active-theme="easter"] .modal,
+html[data-active-theme="easter"] .auth-box {
+  background: rgba(255,255,255,0.88);
+  border-color: rgba(126,203,161,0.3);
+  color: #1a2e1e;
+  box-shadow:
+    0 0 30px rgba(126,203,161,0.15),
+    0 8px 32px rgba(0,0,0,0.08);
+  backdrop-filter: blur(24px);
+}
+html[data-active-theme="easter"] .card * { color: #1a2e1e; }
+html[data-active-theme="easter"] .btn-primary {
+  background: linear-gradient(135deg, #4caf7d, #7ecba1);
+  color: #ffffff;
+  box-shadow: 0 4px 22px rgba(126,203,161,0.45);
+}
+html[data-active-theme="easter"] .input {
+  background: rgba(255,255,255,0.9);
+  color: #1a2e1e;
+  border-color: rgba(126,203,161,0.4);
+}
+html[data-active-theme="easter"] .input::placeholder { color: rgba(26,46,30,0.4); }
+#theme-event-banner[data-theme="easter"] {
+  background: linear-gradient(135deg, rgba(240,250,243,0.97), rgba(252,228,236,0.97));
+  border-bottom: 2px solid rgba(126,203,161,0.5);
+  box-shadow: 0 0 40px rgba(126,203,161,0.25), 0 4px 24px rgba(0,0,0,0.1);
+  color: #2e6b44;
+  text-shadow: 0 0 16px rgba(126,203,161,0.5), 0 1px 4px rgba(0,0,0,0.15);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: EID CELEBRATION  (Mar 29 – Apr 2)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="eid"] {
+  --theme-primary:         #c9a200;
+  --theme-accent:          #2e7d32;
+  --theme-glow:            rgba(201,162,0,0.62);
+  --theme-glow-soft:       rgba(46,125,50,0.22);
+  --theme-text:            #fff8e1;
+  --theme-text-muted:      rgba(255,248,225,0.6);
+  --theme-surface:         rgba(4,12,4,0.97);
+  --theme-surface-glass:   rgba(201,162,0,0.07);
+  --theme-border:          rgba(201,162,0,0.32);
+  --theme-gradient-hero:   linear-gradient(160deg, #040c04 0%, #0e180a 50%, #040c04 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #c9a200, #2e7d32, #4caf50);
+  --theme-banner-bg:       url("https://www.dreamstime.com/golden-crescent-moon-glowing-sparkles-green-background-representing-celebration-eid-al-fitr-adha-ramadan-hijra-ashura-image394182153") center/cover no-repeat,
+                           linear-gradient(160deg,#040c04,#0e180a);
+  --theme-overlay:         radial-gradient(ellipse at 50% 0%,  rgba(201,162,0,0.3)  0%, transparent 60%),
+                           radial-gradient(ellipse at 20% 80%, rgba(46,125,50,0.2)  0%, transparent 55%);
+  --theme-scrollbar:       rgba(201,162,0,0.55);
+  --theme-badge:           #c9a200;
+}
+html[data-active-theme="eid"] body {
+  background: var(--theme-gradient-hero); color: var(--theme-text);
+}
+html[data-active-theme="eid"] body::before {
+  content: ""; position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+/* Geometric pattern overlay */
+html[data-active-theme="eid"] body::after {
+  content: ""; position: fixed; inset: 0;
+  background-image:
+    repeating-linear-gradient(45deg,  rgba(201,162,0,0.03) 0px, rgba(201,162,0,0.03) 1px, transparent 1px, transparent 20px),
+    repeating-linear-gradient(-45deg, rgba(201,162,0,0.03) 0px, rgba(201,162,0,0.03) 1px, transparent 1px, transparent 20px);
+  pointer-events: none; z-index: 0;
+  animation: eidPatternFloat 30s linear infinite;
+}
+@keyframes eidPatternFloat {
+  0%   { background-position: 0px 0px; }
+  100% { background-position: 40px 40px; }
+}
+html[data-active-theme="eid"] .card,
+html[data-active-theme="eid"] .modal,
+html[data-active-theme="eid"] .auth-box {
+  background: rgba(8,18,8,0.88);
+  border-color: rgba(201,162,0,0.35);
+  box-shadow:
+    0 0 32px rgba(201,162,0,0.2),
+    0 8px 32px rgba(0,0,0,0.62);
+  backdrop-filter: blur(24px);
+}
+html[data-active-theme="eid"] .btn-primary {
+  background: linear-gradient(135deg, #9a7c00, #c9a200, #e8bc00);
+  color: #040c04;
+  font-weight: 800;
+  box-shadow: 0 4px 22px rgba(201,162,0,0.52);
+}
+#theme-event-banner[data-theme="eid"] {
+  background: linear-gradient(135deg, rgba(4,12,4,0.97), rgba(14,24,10,0.97));
+  border-bottom: 2px solid rgba(201,162,0,0.52);
+  box-shadow: 0 0 52px rgba(201,162,0,0.3), 0 4px 24px rgba(0,0,0,0.5);
+  color: #fff8e1;
+  text-shadow: 0 0 24px rgba(201,162,0,0.78), 0 2px 8px rgba(0,0,0,0.65);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME: BACK-TO-SCHOOL SEASON  (Sep 1 – Sep 10)
+════════════════════════════════════════════════════════════════════════════ */
+html[data-active-theme="backtoschool"] {
+  --theme-primary:         #1565c0;
+  --theme-accent:          #f9a825;
+  --theme-glow:            rgba(21,101,192,0.55);
+  --theme-glow-soft:       rgba(249,168,37,0.22);
+  --theme-text:            #e8f0fe;
+  --theme-text-muted:      rgba(232,240,254,0.6);
+  --theme-surface:         rgba(2,8,24,0.97);
+  --theme-surface-glass:   rgba(21,101,192,0.07);
+  --theme-border:          rgba(21,101,192,0.32);
+  --theme-gradient-hero:   linear-gradient(160deg, #020818 0%, #041228 50%, #020c1c 100%);
+  --theme-gradient-accent: linear-gradient(135deg, #1565c0, #1976d2, #f9a825);
+  --theme-banner-bg:       url("https://www.vecteezy.com/photo/71154988-back-to-school-essentials-flat-lay-backpack-stationery-and-healthy-snack") center/cover no-repeat,
+                           linear-gradient(160deg,#020818,#041228);
+  --theme-overlay:         radial-gradient(ellipse at 25% 40%, rgba(21,101,192,0.28)  0%, transparent 55%),
+                           radial-gradient(ellipse at 75% 30%, rgba(249,168,37,0.18)  0%, transparent 55%);
+  --theme-scrollbar:       rgba(21,101,192,0.5);
+  --theme-badge:           #1565c0;
+}
+html[data-active-theme="backtoschool"] body {
+  background: var(--theme-gradient-hero); color: var(--theme-text);
+}
+html[data-active-theme="backtoschool"] body::before {
+  content: ""; position: fixed; inset: 0;
+  background: var(--theme-overlay);
+  pointer-events: none; z-index: 0;
+}
+/* Ruled-notebook line pattern */
+html[data-active-theme="backtoschool"] body::after {
+  content: ""; position: fixed; inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      transparent 0px,
+      transparent 27px,
+      rgba(21,101,192,0.06) 28px,
+      transparent 28px
+    );
+  pointer-events: none; z-index: 0;
+}
+html[data-active-theme="backtoschool"] .card,
+html[data-active-theme="backtoschool"] .modal,
+html[data-active-theme="backtoschool"] .auth-box {
+  background: rgba(4,12,28,0.88);
+  border-color: rgba(21,101,192,0.35);
+  box-shadow:
+    0 0 30px rgba(21,101,192,0.2),
+    0 0 60px rgba(249,168,37,0.08),
+    0 8px 32px rgba(0,0,0,0.58);
+  backdrop-filter: blur(24px);
+}
+html[data-active-theme="backtoschool"] .btn-primary {
+  background: linear-gradient(135deg, #0d47a1, #1565c0, #1976d2);
+  box-shadow: 0 4px 22px rgba(21,101,192,0.55), 0 0 44px rgba(21,101,192,0.22);
+}
+html[data-active-theme="backtoschool"] .btn-primary:hover {
+  box-shadow: 0 8px 38px rgba(21,101,192,0.75), 0 0 72px rgba(21,101,192,0.32);
+  transform: translateY(-3px);
+}
+#theme-event-banner[data-theme="backtoschool"] {
+  background: linear-gradient(135deg, rgba(2,8,24,0.97), rgba(4,18,40,0.97));
+  border-bottom: 2px solid rgba(21,101,192,0.55);
+  box-shadow: 0 0 50px rgba(21,101,192,0.3), 0 4px 24px rgba(0,0,0,0.5);
+  color: #e8f0fe;
+  text-shadow:
+    0 0 22px rgba(25,118,210,0.72),
+    0 0 44px rgba(249,168,37,0.3),
+    0 2px 8px rgba(0,0,0,0.65);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CROSS-THEME ANIMATIONS  —  reusable keyframes referenced by any theme
+════════════════════════════════════════════════════════════════════════════ */
+@keyframes neonPulse {
+  0%,100% { box-shadow: 0 0 16px var(--theme-glow, transparent); }
+  50%     { box-shadow: 0 0 40px var(--theme-glow, transparent), 0 0 80px var(--theme-glow-soft, transparent); }
+}
+
+@keyframes themeFadeIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* Active themed cards get a subtle entrance animation on theme apply */
+html[data-active-theme]:not([data-active-theme="default"]) .card {
+  animation: themeFadeIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Neon highlight on focused inputs in any themed mode */
+html[data-active-theme]:not([data-active-theme="default"]) .input:focus {
+  animation: neonPulse 2.5s ease-in-out infinite;
+}
+
+/* Anniversary: extra sparkle ring on stat cards */
+html[data-active-theme="anniversary"] .stat-card:hover {
+  border-color: rgba(255,215,0,0.5);
+  box-shadow:
+    0 0 50px rgba(255,215,0,0.35),
+    0 0 100px rgba(192,132,252,0.2),
+    0 12px 40px rgba(0,0,0,0.65);
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* World Championship: glowing subject cards */
+html[data-active-theme="worldchampionship"] .subject-card:hover {
+  box-shadow:
+    0 0 28px rgba(0,184,148,0.5),
+    0 12px 36px rgba(0,0,0,0.45) !important;
+}
+
+/* Christmas: card border twinkle */
+html[data-active-theme="christmas"] .card {
+  border-color: rgba(192,57,43,0.22);
+  animation: themeFadeIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+             christmasCardTwinkle 8s ease-in-out infinite alternate;
+}
+@keyframes christmasCardTwinkle {
+  0%   { border-color: rgba(192,57,43,0.22); }
+  100% { border-color: rgba(39,174,96,0.28); }
+}
+
+/*
+ * ═══════════════════════════════════════════════════════════════════════════
+ *  END OF LEARN-BETA GLOBAL EVENT THEME ENGINE — CSS BLOCK
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
   </style>
 </head>
 <body>
@@ -14516,6 +16217,7 @@ Return ONLY this JSON (no markdown, no explanation):
           toast("🔔 All notifications read", "info");
         } catch (e) {}
       }
+      
     </script>
     <script>
       /* ═══════════════════════════════════════
@@ -15621,6 +17323,8 @@ function _backToReg() {
           }
         })()
       "
+     
     ></script>
+    <script src="/static/theme-engine.js"></script>
   </body>
 </html>
