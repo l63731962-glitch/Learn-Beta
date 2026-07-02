@@ -67,6 +67,34 @@ def require_auth(f):
     return wrapper
 
 
+def require_active_subscription(f):
+    """Stack directly under @require_auth. Blocks access once the 7-day
+    trial has ended and no active PayPal subscription exists."""
+    @wraps(f)
+    def wrapper(user, *args, **kwargs):
+        db = get_db_direct()
+        try:
+            fresh_user = db.query(models.User).filter_by(id=user.id).first()
+            if not fresh_user:
+                return jsonify({'error': 'User not found'}), 404
+            active = False
+            if fresh_user.subscription_status == "active":
+                active = True
+            elif fresh_user.subscription_status == "trial":
+                if fresh_user.trial_ends_at and datetime.utcnow() < fresh_user.trial_ends_at:
+                    active = True
+            if not active:
+                return jsonify({
+                    "error": "subscription_required",
+                    "message": "Your 7-day free trial has ended. Please subscribe to continue.",
+                    "subscription_status": fresh_user.subscription_status,
+                }), 402
+            return f(user, *args, **kwargs)
+        finally:
+            db.close()
+    return wrapper
+
+
 def _org_filter(query, model, user):
     """
     Scope a query to the user's org.
@@ -84,6 +112,7 @@ def _org_filter(query, model, user):
 
 @community_bp.route('/messages/<group_type>', methods=['GET'])
 @require_auth
+@require_active_subscription
 def get_messages(user, group_type):
     after_id = request.args.get('after', 0, type=int)
     limit    = min(request.args.get('limit', 50, type=int), 100)
@@ -111,6 +140,7 @@ def get_messages(user, group_type):
 
 @community_bp.route('/message/send', methods=['POST'])
 @require_auth
+@require_active_subscription
 def send_message(user):
     data = request.get_json(force=True) or {}
     text = (data.get('message_text') or '').strip()
@@ -140,6 +170,7 @@ def send_message(user):
 
 @community_bp.route('/message/react', methods=['POST'])
 @require_auth
+@require_active_subscription
 def react_message(user):
     data  = request.get_json(force=True) or {}
     db = get_db_direct()
@@ -161,6 +192,7 @@ def react_message(user):
 
 @community_bp.route('/message/delete/<int:msg_id>', methods=['DELETE'])
 @require_auth
+@require_active_subscription
 def delete_message(user, msg_id):
     db = get_db_direct()
     try:
@@ -181,6 +213,7 @@ def delete_message(user, msg_id):
 
 @community_bp.route('/resources/<group_type>', methods=['GET'])
 @require_auth
+@require_active_subscription
 def get_resources(user, group_type):
     db = get_db_direct()
     try:
@@ -208,6 +241,7 @@ def get_resources(user, group_type):
 
 @community_bp.route('/resource/share', methods=['POST'])
 @require_auth
+@require_active_subscription
 def share_resource(user):
     data = request.get_json(force=True) or {}
     db = get_db_direct()
@@ -250,6 +284,7 @@ def like_resource(res_id):
 
 @community_bp.route('/announcements', methods=['GET'])
 @require_auth
+@require_active_subscription
 def get_announcements(user):
     now = datetime.utcnow()
     db = get_db_direct()
@@ -271,6 +306,7 @@ def get_announcements(user):
 
 @community_bp.route('/announcement/create', methods=['POST'])
 @require_auth
+@require_active_subscription
 def create_announcement(user):
     if not _is_teacher(user):
         return jsonify({'error': 'Teachers only'}), 403
@@ -301,6 +337,7 @@ def create_announcement(user):
 
 @community_bp.route('/test/publish', methods=['POST'])
 @require_auth
+@require_active_subscription
 def publish_test(user):
     if not _is_teacher(user):
         return jsonify({'error': 'Teachers only'}), 403
@@ -332,6 +369,7 @@ def publish_test(user):
 
 @community_bp.route('/test/assignments', methods=['GET'])
 @require_auth
+@require_active_subscription
 def get_assignments(user):
     db = get_db_direct()
     try:
@@ -352,6 +390,7 @@ def get_assignments(user):
 
 @community_bp.route('/test/assignment/<int:assignment_id>', methods=['GET'])
 @require_auth
+@require_active_subscription
 def get_assignment_questions(user, assignment_id):
     db = get_db_direct()
     try:
@@ -369,6 +408,7 @@ def get_assignment_questions(user, assignment_id):
 
 @community_bp.route('/test/submit', methods=['POST'])
 @require_auth
+@require_active_subscription
 def submit_test(user):
     data = request.get_json(force=True) or {}
     assignment_id = data.get('assignment_id')
@@ -404,6 +444,7 @@ def submit_test(user):
 
 @community_bp.route('/test/submissions/<int:assignment_id>', methods=['GET'])
 @require_auth
+@require_active_subscription
 def get_submissions(user, assignment_id):
     if not _is_teacher(user):
         return jsonify({'error': 'Teachers only'}), 403
@@ -425,6 +466,7 @@ def get_submissions(user, assignment_id):
 
 @community_bp.route('/homework/questions', methods=['GET'])
 @require_auth
+@require_active_subscription
 def get_homework(user):
     db = get_db_direct()
     try:
@@ -444,6 +486,7 @@ def get_homework(user):
 
 @community_bp.route('/homework/ask', methods=['POST'])
 @require_auth
+@require_active_subscription
 def ask_homework(user):
     data = request.get_json(force=True) or {}
     text = (data.get('question_text') or '').strip()
@@ -467,6 +510,7 @@ def ask_homework(user):
 
 @community_bp.route('/homework/answer', methods=['POST'])
 @require_auth
+@require_active_subscription
 def answer_homework(user):
     data = request.get_json(force=True) or {}
     qid  = data.get('question_id')
@@ -528,6 +572,7 @@ def upvote_answer(answer_id):
 
 @community_bp.route('/notifications', methods=['GET'])
 @require_auth
+@require_active_subscription
 def get_notifications(user):
     db = get_db_direct()
     try:
@@ -549,6 +594,7 @@ def get_notifications(user):
 
 @community_bp.route('/notifications/read', methods=['POST'])
 @require_auth
+@require_active_subscription
 def mark_notifications_read(user):
     db = get_db_direct()
     try:
