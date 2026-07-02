@@ -310,6 +310,23 @@ const EduAPI = (() => {
   };
 
   // ════════════════════════════════════════════════════════════
+  // BILLING
+  // ════════════════════════════════════════════════════════════
+  const billing = {
+    /** Returns { plan_id, price, subscription_status, trial_ends_at } */
+    async planInfo() {
+      return _get('/eduai/billing/plan-info');
+    },
+    /** Call after PayPal onApprove returns a subscriptionID */
+    async activate(subscription_id) {
+      return _post('/eduai/billing/activate', { subscription_id });
+    },
+    async cancel() {
+      return _post('/eduai/billing/cancel');
+    },
+  };
+
+  // ════════════════════════════════════════════════════════════
   // HEALTH
   // ════════════════════════════════════════════════════════════
   const health = {
@@ -319,7 +336,7 @@ const EduAPI = (() => {
   };
 
   // Public API
-  return { auth, teacher, learner, cbt, games, leaderboard, health };
+  return { auth, teacher, learner, cbt, games, leaderboard, health, billing };
 })();
 
 // ── Convenience: expose token getter for legacy code ────────────────────────
