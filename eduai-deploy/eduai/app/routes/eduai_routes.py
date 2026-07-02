@@ -19,7 +19,7 @@ import io
 import json
 import secrets
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 import smtplib
 import random
@@ -236,6 +236,35 @@ def require_admin(f):
     return wrapper
 
 
+def require_active_subscription(f):
+    """Stack directly under @require_auth / @require_teacher / @require_learner.
+    Blocks access once the 7-day trial has ended and no active PayPal
+    subscription exists. Admin routes are intentionally NOT gated with this."""
+    @wraps(f)
+    def wrapper(user, *args, **kwargs):
+        db = get_db_direct()
+        try:
+            fresh_user = db.query(models.User).filter_by(id=user.id).first()
+            if not fresh_user:
+                return jsonify({"error": "User not found"}), 404
+            active = False
+            if fresh_user.subscription_status == "active":
+                active = True
+            elif fresh_user.subscription_status == "trial":
+                if fresh_user.trial_ends_at and datetime.utcnow() < fresh_user.trial_ends_at:
+                    active = True
+            if not active:
+                return jsonify({
+                    "error": "subscription_required",
+                    "message": "Your 7-day free trial has ended. Please subscribe to continue.",
+                    "subscription_status": fresh_user.subscription_status,
+                }), 402
+            return f(user, *args, **kwargs)
+        finally:
+            db.close()
+    return wrapper
+
+
 def _gen_code(prefix: str) -> str:
     """Generate e.g. ADM-A1B2-C3D4 or SCH-A1B2-C3D4"""
     chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # no 0/O/1/I confusion
@@ -385,6 +414,9 @@ def auth_verify_otp():
             account_type=models.AccountType(account_type),
             org_id=org_id,
             is_admin=is_admin,
+            subscription_status="trial",
+            trial_started_at=datetime.utcnow(),
+            trial_ends_at=datetime.utcnow() + timedelta(days=7),
         )
         db.add(user)
         db.commit()
@@ -480,6 +512,9 @@ def auth_register():
             account_type=models.AccountType(account_type),
             org_id=org_id,
             is_admin=is_admin,
+            subscription_status="trial",
+            trial_started_at=datetime.utcnow(),
+            trial_ends_at=datetime.utcnow() + timedelta(days=7),
         )
         db.add(user)
         db.commit()
@@ -626,6 +661,7 @@ def _user_dict(user) -> dict:
 
 @blueprint.route("/teacher/lesson/generate", methods=["POST"])
 @require_teacher
+@require_active_subscription
 def lesson_generate_stream(user):
     """Server-Sent Events stream of the lesson note as it generates."""
     data = request.get_json(force=True)
@@ -664,6 +700,7 @@ def lesson_generate_stream(user):
 
 @blueprint.route("/teacher/lesson/generate-sync", methods=["POST"])
 @require_teacher
+@require_active_subscription
 def lesson_generate_sync(user):
     """Non-streaming lesson note generation — returns full content in one response."""
     data = request.get_json(force=True)
@@ -692,6 +729,7 @@ def lesson_generate_sync(user):
 
 @blueprint.route("/teacher/lesson/save", methods=["POST"])
 @require_teacher
+@require_active_subscription
 def lesson_save(user):
     data = request.get_json(force=True)
     db   = get_db_direct()
@@ -721,6 +759,7 @@ def lesson_save(user):
 
 @blueprint.route("/teacher/lesson/list", methods=["GET"])
 @require_teacher
+@require_active_subscription
 def lesson_list(user):
     db = get_db_direct()
     try:
@@ -738,6 +777,7 @@ def lesson_list(user):
 
 @blueprint.route("/teacher/lesson/<int:note_id>", methods=["DELETE"])
 @require_teacher
+@require_active_subscription
 def lesson_delete(user, note_id):
     db = get_db_direct()
     try:
@@ -774,6 +814,7 @@ def _note_dict(n) -> dict:
 
 @blueprint.route("/teacher/sow/extract", methods=["POST"])
 @require_teacher
+@require_active_subscription
 def sow_extract(user):
     """Extract topics from an uploaded file or generate a 12-week SOW."""
     subject    = request.form.get("subject", "General")
@@ -831,6 +872,7 @@ def sow_extract(user):
 
 @blueprint.route("/teacher/sow/generate-all", methods=["POST"])
 @require_teacher
+@require_active_subscription
 def sow_generate_all(user):
     """
     SSE stream that generates one lesson note per topic and yields progress.
@@ -906,6 +948,7 @@ def sow_generate_all(user):
 
 @blueprint.route("/teacher/test/generate", methods=["POST"])
 @require_teacher
+@require_active_subscription
 def test_generate(user):
     data = request.get_json(force=True)
 
@@ -1047,6 +1090,7 @@ def test_submit_result():
 
 @blueprint.route("/teacher/test/sessions", methods=["GET"])
 @require_teacher
+@require_active_subscription
 def test_sessions(user):
     db = get_db_direct()
     try:
@@ -1064,6 +1108,7 @@ def test_sessions(user):
 
 @blueprint.route("/teacher/test/results/<int:session_id>", methods=["GET"])
 @require_teacher
+@require_active_subscription
 def test_results(user, session_id):
     db = get_db_direct()
     try:
@@ -1088,6 +1133,7 @@ def test_results(user, session_id):
 
 @blueprint.route("/teacher/stats", methods=["GET"])
 @require_teacher
+@require_active_subscription
 def teacher_stats(user):
     db = get_db_direct()
     try:
@@ -1153,6 +1199,7 @@ def _grade(pct: float) -> str:
 
 @blueprint.route("/teacher/performance", methods=["GET"])
 @require_teacher
+@require_active_subscription
 def teacher_performance(user):
     db = get_db_direct()
     try:
@@ -1211,6 +1258,7 @@ def teacher_performance(user):
 
 @blueprint.route("/learner/learn", methods=["POST"])
 @require_learner
+@require_active_subscription
 def learner_learn_stream(user):
     data    = request.get_json(force=True)
     topic   = data.get("topic", "").strip()
@@ -1244,6 +1292,7 @@ def learner_learn_stream(user):
 
 @blueprint.route("/learner/learn-sync", methods=["POST"])
 @require_learner
+@require_active_subscription
 def learner_learn_sync(user):
     data    = request.get_json(force=True)
     topic   = data.get("topic", "").strip()
@@ -1286,6 +1335,7 @@ def learner_learn_sync(user):
 
 @blueprint.route("/learner/quiz/generate", methods=["POST"])
 @require_learner
+@require_active_subscription
 def quiz_generate(user):
     data       = request.get_json(force=True)
     subject    = data.get("subject", "General Knowledge")
@@ -1312,6 +1362,7 @@ def quiz_generate(user):
 
 @blueprint.route("/learner/quiz/submit", methods=["POST"])
 @require_learner
+@require_active_subscription
 def quiz_submit(user):
     """
     Save quiz result and update leaderboard + user points.
@@ -1386,6 +1437,7 @@ def quiz_submit(user):
 
 @blueprint.route("/learner/quiz/history", methods=["GET"])
 @require_learner
+@require_active_subscription
 def quiz_history(user):
     db = get_db_direct()
     try:
@@ -1421,6 +1473,7 @@ def quiz_history(user):
 
 @blueprint.route("/learner/tutor/chat", methods=["POST"])
 @require_learner
+@require_active_subscription
 def tutor_chat_route(user):
     data     = request.get_json(force=True)
     message  = data.get("message", "").strip()
@@ -1516,6 +1569,7 @@ def leaderboard():
 
 @blueprint.route("/games/save-score", methods=["POST"])
 @require_learner
+@require_active_subscription
 def games_save_score(user):
     data = request.get_json(force=True)
     db   = get_db_direct()
@@ -1561,6 +1615,7 @@ def games_save_score(user):
 
 @blueprint.route("/games/history", methods=["GET"])
 @require_learner
+@require_active_subscription
 def games_history(user):
     db = get_db_direct()
     try:
@@ -1591,6 +1646,7 @@ def games_history(user):
 
 @blueprint.route("/learner/dashboard", methods=["GET"])
 @require_learner
+@require_active_subscription
 def learner_dashboard(user):
     db = get_db_direct()
     try:
