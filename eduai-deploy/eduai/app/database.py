@@ -136,3 +136,31 @@ def init_db():
                     print("[EDUAI-DB] ✅ Migration: added org_id to eduai_leaderboard")
     except Exception as e:
         print(f"[EDUAI-DB] Migration note: {e}")
+
+    # ── Safe migration: add subscription columns to eduai_users ──────────
+    _user_sub_columns = {
+        "subscription_status":     "VARCHAR(20) DEFAULT 'trial'",
+        "trial_started_at":        "DATETIME",
+        "trial_ends_at":           "DATETIME",
+        "paypal_subscription_id":  "VARCHAR(100)",
+        "paypal_plan_id":          "VARCHAR(100)",
+        "subscription_updated_at": "DATETIME",
+    }
+    try:
+        with engine.connect() as conn:
+            if DATABASE_URL.startswith("sqlite"):
+                result = conn.execute(
+                    __import__("sqlalchemy").text("PRAGMA table_info(eduai_users)")
+                ).fetchall()
+                existing_cols = [row[1] for row in result]
+                for col_name, col_def in _user_sub_columns.items():
+                    if col_name not in existing_cols:
+                        conn.execute(
+                            __import__("sqlalchemy").text(
+                                f"ALTER TABLE eduai_users ADD COLUMN {col_name} {col_def}"
+                            )
+                        )
+                        conn.commit()
+                        print(f"[EDUAI-DB] ✅ Migration: added {col_name} to eduai_users")
+    except Exception as e:
+        print(f"[EDUAI-DB] Subscription migration note: {e}")
