@@ -86,6 +86,35 @@ def require_teacher(f):
     return wrapper
 
 
+def require_active_subscription(f):
+    """Stack directly under @require_learner / @require_teacher. Blocks
+    access once the 7-day trial has ended and no active PayPal
+    subscription exists."""
+    @wraps(f)
+    def wrapper(user, *args, **kwargs):
+        db = get_db_direct()
+        try:
+            fresh_user = db.query(models.User).filter_by(id=user.id).first()
+            if not fresh_user:
+                return jsonify({"error": "User not found"}), 404
+            active = False
+            if fresh_user.subscription_status == "active":
+                active = True
+            elif fresh_user.subscription_status == "trial":
+                if fresh_user.trial_ends_at and datetime.utcnow() < fresh_user.trial_ends_at:
+                    active = True
+            if not active:
+                return jsonify({
+                    "error": "subscription_required",
+                    "message": "Your 7-day free trial has ended. Please subscribe to continue.",
+                    "subscription_status": fresh_user.subscription_status,
+                }), 402
+            return f(user, *args, **kwargs)
+        finally:
+            db.close()
+    return wrapper
+
+
 def _today() -> str:
     return datetime.utcnow().strftime("%Y-%m-%d")
 
@@ -125,6 +154,7 @@ def _gather_history(db, learner_id: int):
 
 @blueprint.route("/curriculum-gaps", methods=["GET"])
 @require_learner
+@require_active_subscription
 def curriculum_gaps(user):
     db = get_db_direct()
     try:
@@ -143,6 +173,7 @@ def curriculum_gaps(user):
 
 @blueprint.route("/curriculum-gaps/refresh", methods=["POST"])
 @require_learner
+@require_active_subscription
 def curriculum_gaps_refresh(user):
     db = get_db_direct()
     try:
@@ -199,6 +230,7 @@ def _gap_report_dict(r) -> dict:
 
 @blueprint.route("/exam-readiness", methods=["POST"])
 @require_learner
+@require_active_subscription
 def exam_readiness(user):
     data      = request.get_json(force=True) or {}
     exam_type = (data.get("exam_type") or "").strip()
@@ -247,6 +279,7 @@ def exam_readiness(user):
 
 @blueprint.route("/exam-readiness/history", methods=["GET"])
 @require_learner
+@require_active_subscription
 def exam_readiness_history(user):
     db = get_db_direct()
     try:
@@ -405,6 +438,7 @@ def _generate_report_card_for(db, learner, generated_by_id=None):
 
 @blueprint.route("/report-card", methods=["POST"])
 @require_learner
+@require_active_subscription
 def report_card_generate(user):
     db = get_db_direct()
     try:
@@ -418,6 +452,7 @@ def report_card_generate(user):
 
 @blueprint.route("/report-card/history", methods=["GET"])
 @require_learner
+@require_active_subscription
 def report_card_history(user):
     db = get_db_direct()
     try:
@@ -436,6 +471,7 @@ def report_card_history(user):
 
 @blueprint.route("/report-card/<int:report_id>", methods=["GET"])
 @require_learner
+@require_active_subscription
 def report_card_detail(user, report_id):
     db = get_db_direct()
     try:
@@ -453,6 +489,7 @@ def report_card_detail(user, report_id):
 
 @blueprint.route("/teacher/report-card", methods=["POST"])
 @require_teacher
+@require_active_subscription
 def teacher_report_card_generate(user):
     """Teacher generates a report card for one of their students.
     Body: { learner_id: int }
@@ -518,6 +555,7 @@ def _report_card_summary_dict(c) -> dict:
 
 @blueprint.route("/essay-check", methods=["POST"])
 @require_learner
+@require_active_subscription
 def essay_check(user):
     data       = request.get_json(force=True) or {}
     essay_text = (data.get("essay_text") or "").strip()
@@ -561,6 +599,7 @@ def essay_check(user):
 
 @blueprint.route("/essay-check/history", methods=["GET"])
 @require_learner
+@require_active_subscription
 def essay_check_history(user):
     db = get_db_direct()
     try:
@@ -578,6 +617,7 @@ def essay_check_history(user):
 
 @blueprint.route("/essay-check/<int:check_id>", methods=["GET"])
 @require_learner
+@require_active_subscription
 def essay_check_detail(user, check_id):
     db = get_db_direct()
     try:
@@ -732,6 +772,7 @@ def _fetch_transcript(video_id: str):
 
 @blueprint.route("/video-lesson", methods=["POST"])
 @require_teacher
+@require_active_subscription
 def video_lesson_generate(user):
     data        = request.get_json(force=True) or {}
     video_url   = (data.get("video_url") or "").strip()
@@ -796,6 +837,7 @@ def video_lesson_generate(user):
 
 @blueprint.route("/video-lesson/history", methods=["GET"])
 @require_teacher
+@require_active_subscription
 def video_lesson_history(user):
     db = get_db_direct()
     try:
@@ -813,6 +855,7 @@ def video_lesson_history(user):
 
 @blueprint.route("/video-lesson/<int:plan_id>", methods=["GET"])
 @require_teacher
+@require_active_subscription
 def video_lesson_detail(user, plan_id):
     db = get_db_direct()
     try:
