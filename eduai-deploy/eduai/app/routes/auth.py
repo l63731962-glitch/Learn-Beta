@@ -18,14 +18,14 @@ Routes:
     POST  /eduai/auth/update-language
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import Blueprint, request, jsonify
 
-from app.database import get_db_direct
-from app import models
-from app.service import auth_service
+from eduai.app.database import get_db_direct
+from eduai.app import models
+from eduai.app.service import auth_service
 
 # ── Blueprint ──────────────────────────────────────────────────────────────
 auth_bp = Blueprint("eduai_auth", __name__, url_prefix="/eduai/auth")
@@ -162,6 +162,9 @@ def register():
             language      = language,
             language_name = lang_name,
             last_login    = datetime.utcnow(),
+            subscription_status = "trial",
+            trial_started_at    = datetime.utcnow(),
+            trial_ends_at       = datetime.utcnow() + timedelta(days=7),
         )
         db.add(user)
         db.commit()
