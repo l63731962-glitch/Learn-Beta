@@ -3948,6 +3948,271 @@
       html[data-active-theme]:not([data-active-theme="default"]) body {
         padding-top: 40px;
       }
+
+      /* ═══════════════════════════════════════════════════════════════
+         PAYWALL — trial banner, subscription modal, manage-plan card
+         ═══════════════════════════════════════════════════════════════ */
+      .trial-banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+        border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+        text-align: center;
+        backdrop-filter: blur(10px);
+      }
+      body.has-trial-banner {
+        padding-top: 44px;
+      }
+      .trial-banner.trial-urgent {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.25));
+        border-bottom-color: rgba(239, 68, 68, 0.35);
+      }
+      .trial-banner .trial-days {
+        color: #a78bfa;
+        font-weight: 800;
+      }
+      .trial-banner.trial-urgent .trial-days {
+        color: #fca5a5;
+      }
+      .trial-banner button {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border: none;
+        color: #fff;
+        font-family: "Lexend", sans-serif;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 6px 16px;
+        border-radius: var(--radius-full);
+        cursor: pointer;
+        transition: all 0.2s var(--ease-smooth);
+      }
+      .trial-banner button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.5);
+      }
+      .paywall-modal {
+        max-width: 460px;
+        text-align: center;
+        padding: 40px 36px;
+      }
+      .paywall-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 18px;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        box-shadow: 0 8px 30px rgba(99, 102, 241, 0.45);
+      }
+      .paywall-title {
+        font-family: "Syne", sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 8px;
+      }
+      .paywall-subtitle {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.55);
+        line-height: 1.6;
+        margin-bottom: 28px;
+      }
+      .paywall-subtitle strong {
+        color: #a78bfa;
+      }
+      .paywall-price-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        margin-bottom: 22px;
+        position: relative;
+        overflow: hidden;
+      }
+      .paywall-price-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 50% 0%,
+          rgba(99, 102, 241, 0.15) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .paywall-badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #6ee7b7;
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        margin-bottom: 14px;
+      }
+      .paywall-price {
+        font-family: "Syne", sans-serif;
+        font-size: 40px;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .paywall-price span {
+        font-size: 15px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .paywall-plan-name {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 18px;
+      }
+      .paywall-features {
+        list-style: none;
+        text-align: left;
+        margin: 0 0 4px;
+        padding: 0;
+      }
+      .paywall-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13.5px;
+        color: rgba(255, 255, 255, 0.8);
+        padding: 8px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .paywall-features li:first-child {
+        border-top: none;
+      }
+      .paywall-features li::before {
+        content: "✓";
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: rgba(16, 185, 129, 0.2);
+        color: #6ee7b7;
+        font-size: 11px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1px;
+      }
+      #paypal-button-container {
+        margin-top: 18px;
+        min-height: 45px;
+      }
+      .paywall-loading-paypal {
+        font-size: 12.5px;
+        color: rgba(255, 255, 255, 0.4);
+        padding: 12px 0;
+      }
+      .paywall-secure-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.35);
+        margin-top: 16px;
+      }
+      .paywall-status {
+        font-size: 13px;
+        padding: 10px 14px;
+        border-radius: var(--radius-md);
+        margin-top: 14px;
+        display: none;
+      }
+      .paywall-status.show {
+        display: block;
+      }
+      .paywall-status.status-error {
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+      }
+      .paywall-status.status-success {
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #6ee7b7;
+      }
+      .paywall-close-x {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: rgba(255, 255, 255, 0.08);
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .paywall-close-x:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+      }
+      .sub-manage-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius-lg);
+        padding: 18px 22px;
+      }
+      .sub-manage-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+      }
+      .sub-manage-status.st-active {
+        color: #6ee7b7;
+        background: rgba(16, 185, 129, 0.15);
+      }
+      .sub-manage-status.st-trial {
+        color: #a78bfa;
+        background: rgba(99, 102, 241, 0.18);
+      }
+      .sub-manage-status.st-past_due,
+      .sub-manage-status.st-expired,
+      .sub-manage-status.st-cancelled {
+        color: #fca5a5;
+        background: rgba(239, 68, 68, 0.15);
+      }
     </style>
   </head>
   <body>
@@ -7888,6 +8153,64 @@
           Cancel
         </button>
       </div>
+    </div>
+
+    <!-- ═══════════════ PAYWALL MODAL ═══════════════ -->
+    <div id="paywall-modal" class="modal-overlay hidden">
+      <div class="modal paywall-modal" style="position: relative">
+        <button class="paywall-close-x" onclick="closePaywall()">✕</button>
+
+        <div class="paywall-icon">🔒</div>
+        <div class="paywall-title" id="paywall-title">
+          Your free trial has ended
+        </div>
+        <div class="paywall-subtitle" id="paywall-subtitle">
+          Keep learning without limits — subscribe to
+          <strong>Learn-Beta</strong> and get full access again.
+        </div>
+
+        <div class="paywall-price-card">
+          <div class="paywall-badge" id="paywall-badge">
+            7-day free trial included
+          </div>
+          <div class="paywall-price" id="paywall-price">
+            $3<span>/month</span>
+          </div>
+          <div class="paywall-plan-name" id="paywall-plan-name">
+            Learner Plan
+          </div>
+
+          <ul class="paywall-features" id="paywall-features">
+            <li>Unlimited AI tutoring &amp; explanations</li>
+            <li>Unlimited quizzes &amp; practice tests</li>
+            <li>Progress tracking &amp; leaderboard</li>
+            <li>Cancel anytime, no questions asked</li>
+          </ul>
+
+          <div id="paypal-button-container">
+            <div class="paywall-loading-paypal">
+              Loading secure checkout…
+            </div>
+          </div>
+        </div>
+
+        <div class="paywall-status" id="paywall-status"></div>
+
+        <div class="paywall-secure-note">
+          🔒 Payments secured &amp; processed by PayPal
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ TRIAL BANNER ═══════════════
+         Sits at the very top of the page, above everything else.
+         Shown/hidden automatically by refreshTrialBanner(). -->
+    <div id="trial-banner" class="trial-banner hidden">
+      <span id="trial-banner-text">
+        <span class="trial-days" id="trial-days-left">—</span> days left in
+        your free trial
+      </span>
+      <button onclick="openPaywall()">Subscribe now</button>
     </div>
 
     <!-- ═══════════════ AUTH MODAL ═══════════════ -->
@@ -17325,6 +17648,243 @@ function _backToReg() {
       "
      
     ></script>
+
+    <!-- ═══════════════ PAYWALL LOGIC ═══════════════ -->
+    <script>
+      /**
+       * PAYWALL_CONFIG.paypalClientId — your PayPal REST app's PUBLIC
+       * client ID (safe for frontend). Same PayPal app as the
+       * PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET set in your backend .env.
+       * Get it from developer.paypal.com → Apps & Credentials.
+       */
+      const PAYWALL_CONFIG = {
+        paypalClientId: "YOUR_PAYPAL_CLIENT_ID",
+        currency: "USD",
+      };
+
+      let _paypalSdkLoaded = false;
+      let _paypalSdkLoading = null;
+
+      function _loadPayPalSdk() {
+        if (_paypalSdkLoaded) return Promise.resolve();
+        if (_paypalSdkLoading) return _paypalSdkLoading;
+        _paypalSdkLoading = new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(
+            PAYWALL_CONFIG.paypalClientId
+          )}&vault=true&intent=subscription&currency=${PAYWALL_CONFIG.currency}`;
+          s.onload = () => {
+            _paypalSdkLoaded = true;
+            resolve();
+          };
+          s.onerror = () => reject(new Error("Failed to load PayPal SDK"));
+          document.head.appendChild(s);
+        });
+        return _paypalSdkLoading;
+      }
+
+      function _paywallStatus(msg, type) {
+        const box = el("paywall-status");
+        if (!box) return;
+        box.textContent = msg;
+        box.className = `paywall-status show ${type ? "status-" + type : ""}`;
+      }
+
+      function _clearPaywallStatus() {
+        const box = el("paywall-status");
+        if (!box) return;
+        box.className = "paywall-status";
+        box.textContent = "";
+      }
+
+      async function openPaywall() {
+        const modal = el("paywall-modal");
+        if (!modal) return;
+        modal.classList.remove("hidden");
+        modal.style.display = "flex";
+        _clearPaywallStatus();
+
+        const container = el("paypal-button-container");
+        if (container) {
+          container.innerHTML =
+            '<div class="paywall-loading-paypal">Loading secure checkout…</div>';
+        }
+
+        let info;
+        try {
+          info = await EduAPI.billing.planInfo();
+        } catch (e) {
+          _paywallStatus("Could not load subscription info. Please try again.", "error");
+          return;
+        }
+        if (info && info.error) {
+          _paywallStatus(info.error, "error");
+          return;
+        }
+
+        const isTeacher = window.S && S.user && S.user.role === "teacher";
+        el("paywall-plan-name").textContent = isTeacher ? "Teacher Plan" : "Learner Plan";
+        el("paywall-price").innerHTML = `$${info.price}<span>/month</span>`;
+
+        if (info.subscription_status === "trial" && info.trial_ends_at) {
+          const daysLeft = _daysLeft(info.trial_ends_at);
+          if (daysLeft > 0) {
+            el("paywall-badge").textContent = `${daysLeft} day${daysLeft === 1 ? "" : "s"} left in your trial`;
+            el("paywall-title").textContent = "Upgrade before your trial ends";
+          } else {
+            el("paywall-badge").textContent = "Trial ended";
+            el("paywall-title").textContent = "Your free trial has ended";
+          }
+        } else if (info.subscription_status === "past_due") {
+          el("paywall-badge").textContent = "Payment issue";
+          el("paywall-title").textContent = "Update your payment method";
+        } else if (info.subscription_status === "cancelled" || info.subscription_status === "expired") {
+          el("paywall-badge").textContent = "Subscription inactive";
+          el("paywall-title").textContent = "Reactivate your subscription";
+        }
+
+        if (!info.plan_id) {
+          _paywallStatus("Subscriptions aren't configured yet. Please contact support.", "error");
+          return;
+        }
+
+        try {
+          await _loadPayPalSdk();
+          _renderPayPalButton(info.plan_id, container);
+        } catch (e) {
+          _paywallStatus("Could not load PayPal checkout. Check your connection.", "error");
+        }
+      }
+
+      function _renderPayPalButton(planId, container) {
+        if (!container) return;
+        container.innerHTML = "";
+        if (!window.paypal || !window.paypal.Buttons) {
+          _paywallStatus("PayPal failed to load. Please refresh and try again.", "error");
+          return;
+        }
+        window.paypal
+          .Buttons({
+            style: { shape: "pill", color: "blue", layout: "vertical", label: "subscribe" },
+            createSubscription: function (data, actions) {
+              return actions.subscription.create({ plan_id: planId });
+            },
+            onApprove: async function (data) {
+              _paywallStatus("Confirming your subscription…", null);
+              try {
+                const res = await EduAPI.billing.activate(data.subscriptionID);
+                if (res && res.status === "active") {
+                  _paywallStatus("You're all set! Subscription active.", "success");
+                  confetti();
+                  toast("🎉 Subscription activated — welcome back!", "success");
+                  setTimeout(() => {
+                    closePaywall();
+                    refreshTrialBanner();
+                  }, 1400);
+                } else {
+                  _paywallStatus(
+                    (res && res.error) || "Could not confirm your subscription. Contact support.",
+                    "error"
+                  );
+                }
+              } catch (e) {
+                _paywallStatus("Something went wrong confirming payment.", "error");
+              }
+            },
+            onError: function () {
+              _paywallStatus("PayPal checkout error. Please try again.", "error");
+            },
+            onCancel: function () {
+              _paywallStatus("Checkout cancelled — no charge was made.", null);
+            },
+          })
+          .render("#paypal-button-container");
+      }
+
+      function closePaywall() {
+        const modal = el("paywall-modal");
+        if (!modal) return;
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+        _clearPaywallStatus();
+      }
+
+      function _daysLeft(isoDate) {
+        const end = new Date(isoDate);
+        const now = new Date();
+        return Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+      }
+
+      async function refreshTrialBanner() {
+        const banner = el("trial-banner");
+        if (!banner || !EduAPI.auth.isLoggedIn()) return;
+
+        let info;
+        try {
+          info = await EduAPI.billing.planInfo();
+        } catch (e) {
+          return;
+        }
+        if (!info || info.error) return;
+
+        if (info.subscription_status === "active") {
+          banner.classList.add("hidden");
+          document.body.classList.remove("has-trial-banner");
+          return;
+        }
+
+        if (info.subscription_status === "trial" && info.trial_ends_at) {
+          const daysLeft = _daysLeft(info.trial_ends_at);
+          banner.classList.remove("hidden");
+          document.body.classList.add("has-trial-banner");
+          banner.classList.toggle("trial-urgent", daysLeft <= 2);
+          el("trial-days-left").textContent = Math.max(daysLeft, 0);
+          el("trial-banner-text").innerHTML =
+            daysLeft > 0
+              ? `<span class="trial-days">${daysLeft}</span> day${daysLeft === 1 ? "" : "s"} left in your free trial`
+              : `Your free trial has ended`;
+          return;
+        }
+
+        banner.classList.remove("hidden");
+        document.body.classList.add("has-trial-banner");
+        banner.classList.add("trial-urgent");
+        el("trial-banner-text").textContent =
+          info.subscription_status === "past_due"
+            ? "There's a problem with your payment"
+            : "Your subscription has ended";
+      }
+
+      function patchEduAPIForPaywall() {
+        const originalFetch = window.fetch;
+        window.fetch = async function (...args) {
+          const response = await originalFetch.apply(this, args);
+          if (response.status === 402) {
+            response
+              .clone()
+              .json()
+              .then((data) => {
+                if (data && data.error === "subscription_required") openPaywall();
+              })
+              .catch(() => {});
+          }
+          return response;
+        };
+      }
+
+      window.addEventListener("load", () => {
+        patchEduAPIForPaywall();
+        setTimeout(refreshTrialBanner, 1500);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          const m = el("paywall-modal");
+          if (m && !m.classList.contains("hidden")) closePaywall();
+        }
+      });
+    </script>
+
     <script src="/static/theme-engine.js"></script>
   </body>
 </html>
