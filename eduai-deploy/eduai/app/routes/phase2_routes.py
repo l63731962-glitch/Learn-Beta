@@ -93,6 +93,34 @@ def require_learner(f):
     return wrapper
 
 
+def require_active_subscription(f):
+    """Stack directly under @require_learner. Blocks access once the 7-day
+    trial has ended and no active PayPal subscription exists."""
+    @wraps(f)
+    def wrapper(user, *args, **kwargs):
+        db = get_db_direct()
+        try:
+            fresh_user = db.query(models.User).filter_by(id=user.id).first()
+            if not fresh_user:
+                return jsonify({"error": "User not found"}), 404
+            active = False
+            if fresh_user.subscription_status == "active":
+                active = True
+            elif fresh_user.subscription_status == "trial":
+                if fresh_user.trial_ends_at and datetime.utcnow() < fresh_user.trial_ends_at:
+                    active = True
+            if not active:
+                return jsonify({
+                    "error": "subscription_required",
+                    "message": "Your 7-day free trial has ended. Please subscribe to continue.",
+                    "subscription_status": fresh_user.subscription_status,
+                }), 402
+            return f(user, *args, **kwargs)
+        finally:
+            db.close()
+    return wrapper
+
+
 # ════════════════════════════════════════════════════════════════════════════
 # ── BATTLE MODE ───────────────────────────────────────────────────────────
 # POST /eduai/phase2/battle/create        → start a battle, get invite code
@@ -109,6 +137,7 @@ def _gen_invite_code() -> str:
 
 @blueprint.route("/battle/create", methods=["POST"])
 @require_learner
+@require_active_subscription
 def battle_create(user):
     """
     Body: { subject?: str, topic?: str, num_questions?: int (default 5, max 10),
@@ -169,6 +198,7 @@ def battle_create(user):
 
 @blueprint.route("/battle/join", methods=["POST"])
 @require_learner
+@require_active_subscription
 def battle_join(user):
     """
     Body: { invite_code: str }
@@ -210,6 +240,7 @@ def battle_join(user):
 
 @blueprint.route("/battle/<int:battle_id>/state", methods=["GET"])
 @require_learner
+@require_active_subscription
 def battle_state(user, battle_id):
     """
     Poll endpoint — call every ~2s while in a battle.
@@ -258,6 +289,7 @@ def battle_state(user, battle_id):
 
 @blueprint.route("/battle/<int:battle_id>/answer", methods=["POST"])
 @require_learner
+@require_active_subscription
 def battle_answer(user, battle_id):
     """
     Body: { question_index: int, chosen_index: int }
@@ -311,6 +343,7 @@ def battle_answer(user, battle_id):
 
 @blueprint.route("/battle/my-active", methods=["GET"])
 @require_learner
+@require_active_subscription
 def battle_my_active(user):
     """Returns the learner's most recent waiting/active battle, if any."""
     db = get_db_direct()
@@ -409,6 +442,7 @@ _MAX_IMAGE_BYTES = 8 * 1024 * 1024
 
 @blueprint.route("/textbook/scan", methods=["POST"])
 @require_learner
+@require_active_subscription
 def textbook_scan(user):
     """
     Multipart form-data:
@@ -480,6 +514,7 @@ def textbook_scan(user):
 
 @blueprint.route("/textbook/quiz", methods=["POST"])
 @require_learner
+@require_active_subscription
 def textbook_quiz(user):
     """
     Body: { scan_id: int, num_questions?: int (default 5, max 15) }
@@ -523,6 +558,7 @@ def textbook_quiz(user):
 
 @blueprint.route("/textbook/history", methods=["GET"])
 @require_learner
+@require_active_subscription
 def textbook_history(user):
     db = get_db_direct()
     try:
@@ -550,6 +586,7 @@ def textbook_history(user):
 
 @blueprint.route("/textbook/scan/<int:scan_id>", methods=["GET"])
 @require_learner
+@require_active_subscription
 def textbook_scan_detail(user, scan_id):
     db = get_db_direct()
     try:
