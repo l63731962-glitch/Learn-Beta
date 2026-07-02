@@ -74,6 +74,36 @@ def require_auth(f):
     return wrapper
 
 
+def require_active_subscription(f):
+    """Stack directly under @require_auth / @require_learner / @require_parent.
+    Blocks access once the 7-day trial has ended and no active PayPal
+    subscription exists. Expects `user` as the first positional arg."""
+    @wraps(f)
+    def wrapper(user, *args, **kwargs):
+        from datetime import datetime as _dt
+        db = get_db_direct()
+        try:
+            fresh_user = db.query(models.User).filter_by(id=user.id).first()
+            if not fresh_user:
+                return jsonify({"error": "User not found"}), 404
+            active = False
+            if fresh_user.subscription_status == "active":
+                active = True
+            elif fresh_user.subscription_status == "trial":
+                if fresh_user.trial_ends_at and _dt.utcnow() < fresh_user.trial_ends_at:
+                    active = True
+            if not active:
+                return jsonify({
+                    "error": "subscription_required",
+                    "message": "Your 7-day free trial has ended. Please subscribe to continue.",
+                    "subscription_status": fresh_user.subscription_status,
+                }), 402
+            return f(user, *args, **kwargs)
+        finally:
+            db.close()
+    return wrapper
+
+
 def require_learner(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -167,6 +197,7 @@ def _record_activity_and_update_streak(db, user, source: str):
 
 @blueprint.route("/daily-challenge", methods=["GET"])
 @require_learner
+@require_active_subscription
 def get_daily_challenge(user):
     """
     Returns today's challenge for this learner. If none exists yet for today,
@@ -223,6 +254,7 @@ def get_daily_challenge(user):
 
 @blueprint.route("/daily-challenge/submit", methods=["POST"])
 @require_learner
+@require_active_subscription
 def submit_daily_challenge(user):
     """
     Body: { answers: [int, ...] }  (0-based option indices, same as quiz/submit)
@@ -278,6 +310,7 @@ def submit_daily_challenge(user):
 
 @blueprint.route("/streak", methods=["GET"])
 @require_learner
+@require_active_subscription
 def get_streak(user):
     db = get_db_direct()
     try:
@@ -333,6 +366,7 @@ def _coins_for_duration(minutes: int) -> int:
 
 @blueprint.route("/study/start", methods=["POST"])
 @require_learner
+@require_active_subscription
 def study_start(user):
     """
     Body: { subject?: str, duration_min?: int }  (default 25 = standard Pomodoro)
@@ -361,6 +395,7 @@ def study_start(user):
 
 @blueprint.route("/study/complete", methods=["POST"])
 @require_learner
+@require_active_subscription
 def study_complete(user):
     """
     Body: { session_id: int }
@@ -406,6 +441,7 @@ def study_complete(user):
 
 @blueprint.route("/study/history", methods=["GET"])
 @require_learner
+@require_active_subscription
 def study_history(user):
     db = get_db_direct()
     try:
@@ -444,6 +480,7 @@ def study_history(user):
 
 @blueprint.route("/learner/link-code", methods=["GET"])
 @require_learner
+@require_active_subscription
 def learner_link_code(user):
     """Returns the learner's persistent link code, generating one if needed."""
     db = get_db_direct()
@@ -471,6 +508,7 @@ def learner_link_code(user):
 
 @blueprint.route("/parent/link", methods=["POST"])
 @require_parent
+@require_active_subscription
 def parent_link_child(user):
     """
     Body: { link_code: str }
@@ -509,6 +547,7 @@ def parent_link_child(user):
 
 @blueprint.route("/parent/children", methods=["GET"])
 @require_parent
+@require_active_subscription
 def parent_children(user):
     db = get_db_direct()
     try:
@@ -533,6 +572,7 @@ def parent_children(user):
 
 @blueprint.route("/parent/child/<int:child_id>/report", methods=["GET"])
 @require_parent
+@require_active_subscription
 def parent_child_report(user, child_id):
     """
     Weekly progress report for a linked child.
