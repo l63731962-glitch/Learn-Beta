@@ -120,4 +120,17 @@ class CommunityNotification(Base):
     title       = Column(String(200), nullable=True)
     body        = Column(Text,        nullable=True)
     is_read     = Column(Boolean,     default=False)
-    created_at  = Column(DateTime,    default=datetime.utcnow)
+    created_at    = Column(DateTime,    default=datetime.utcnow)
+
+
+class AppRating(Base):
+    __tablename__ = 'app_ratings'
+    id           = Column(Integer,     primary_key=True, index=True)
+    user_id      = Column(Integer,     nullable=False, index=True)
+    user_name    = Column(String(120), nullable=False)
+    stars        = Column(Integer,     nullable=False)   # 1-5
+    comment_text = Column(Text,        nullable=True)     # what they think about the app
+    admin_reply  = Column(Text,        nullable=True)     # your answer to their comment
+    replied_at   = Column(DateTime,    nullable=True)
+    is_public    = Column(Boolean,     default=True)      # show on a public "reviews" list
+    created_at   = Column(DateTime,    default=datetime.utcnow)
