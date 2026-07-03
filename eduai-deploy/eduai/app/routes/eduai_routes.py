@@ -32,6 +32,7 @@ from flask import Blueprint, request, jsonify, Response, stream_with_context
 from sqlalchemy.orm import joinedload
 from eduai.app.database import get_db_direct, init_db
 from eduai.app import models
+from eduai.app import community_models
 
 # ── Services ──────────────────────────────────────────────────────────────────
 from eduai.app.service import ai_service, auth_service
@@ -2023,6 +2024,97 @@ def admin_leaderboard(user):
                 for i, e in enumerate(entries)
             ]
         })
+    finally:
+        db.close()
+
+# ════════════════════════════════════════════════════════════════════════════
+# APP RATINGS — stars + comment + admin reply
+# ════════════════════════════════════════════════════════════════════════════
+
+ADMIN_EMAIL = "anyanwumichael1800@gmail.com"
+
+def _is_owner_admin(user) -> bool:
+    return (user.email or "").strip().lower() == ADMIN_EMAIL
+
+
+@blueprint.route("/ratings/submit", methods=["POST"])
+@require_auth
+def submit_rating(user):
+    data = request.get_json(force=True) or {}
+    stars = data.get("stars")
+    comment_text = (data.get("comment_text") or "").strip()
+
+    if not isinstance(stars, int) or stars < 1 or stars > 5:
+        return jsonify({"error": "stars must be an integer 1-5"}), 400
+
+    db = get_db_direct()
+    try:
+        rating = community_models.AppRating(
+            user_id=user.id,
+            user_name=user.name,
+            stars=stars,
+            comment_text=comment_text or None,
+        )
+        db.add(rating)
+        db.commit()
+        db.refresh(rating)
+        return jsonify({"status": "submitted", "id": rating.id}), 201
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
+
+@blueprint.route("/ratings/list", methods=["GET"])
+def list_ratings():
+    """Public — shows stars + comments + your admin replies. No auth needed to view."""
+    db = get_db_direct()
+    try:
+        rows = (
+            db.query(community_models.AppRating)
+            .filter_by(is_public=True)
+            .order_by(community_models.AppRating.created_at.desc())
+            .limit(100)
+            .all()
+        )
+        out = [{
+            "id": r.id,
+            "user_name": r.user_name,
+            "stars": r.stars,
+            "comment_text": r.comment_text,
+            "admin_reply": r.admin_reply,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+        } for r in rows]
+        return jsonify({"ratings": out}), 200
+    finally:
+        db.close()
+
+
+@blueprint.route("/ratings/<int:rating_id>/reply", methods=["POST"])
+@require_auth
+def reply_to_rating(user, rating_id):
+    """Owner-admin only — answer a user's comment."""
+    if not _is_owner_admin(user):
+        return jsonify({"error": "Only the app owner can reply"}), 403
+
+    data = request.get_json(force=True) or {}
+    reply_text = (data.get("admin_reply") or "").strip()
+    if not reply_text:
+        return jsonify({"error": "admin_reply is required"}), 400
+
+    db = get_db_direct()
+    try:
+        rating = db.query(community_models.AppRating).filter_by(id=rating_id).first()
+        if not rating:
+            return jsonify({"error": "Rating not found"}), 404
+        rating.admin_reply = reply_text
+        rating.replied_at = datetime.utcnow()
+        db.commit()
+        return jsonify({"status": "replied"}), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
     finally:
         db.close()
 
