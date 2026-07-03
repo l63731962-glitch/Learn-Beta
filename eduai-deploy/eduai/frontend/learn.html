@@ -18024,6 +18024,7 @@ function _backToReg() {
 
     <!-- Rate App Trigger Button -->
     <button id="openRatingModalBtn" class="rating-trigger-btn">⭐ Rate this App</button>
+    <button id="viewRatingsBtn" class="rating-trigger-btn" style="bottom:60px;">💬 View Comments</button>
 
     <!-- Rating Modal -->
     <div class="rating-modal-overlay" id="ratingModalOverlay">
@@ -18083,6 +18084,55 @@ function _backToReg() {
         </div>
       </div>
     </div>
+    <!-- View Comments Modal -->
+    <div class="rating-modal-overlay" id="viewRatingsOverlay">
+      <div class="rating-modal-box" style="max-width:480px;max-height:80vh;overflow-y:auto;">
+        <button class="rating-modal-close" id="viewRatingsClose">&times;</button>
+        <div class="rating-modal-title">💬 What people are saying</div>
+        <div id="ratingsListArea" style="margin-top:16px;"></div>
+      </div>
+    </div>
+
+<script>
+      (function () {
+        const viewBtn = document.getElementById('viewRatingsBtn');
+        const viewOverlay = document.getElementById('viewRatingsOverlay');
+        const viewClose = document.getElementById('viewRatingsClose');
+        const listArea = document.getElementById('ratingsListArea');
+
+        async function loadRatings() {
+          listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">Loading...</div>';
+          try {
+            const res = await fetch('/eduai/ratings/list');
+            const data = await res.json();
+            const ratings = data.ratings || [];
+            if (!ratings.length) {
+              listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">No comments yet.</div>';
+              return;
+            }
+            listArea.innerHTML = ratings.map(r => `
+              <div style="border-bottom:1px solid rgba(255,255,255,0.1);padding:12px 0;">
+                <div style="color:#ffc93c;font-size:14px;">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+                <div style="color:#fff;font-size:13px;margin-top:4px;">${r.user_name}</div>
+                ${r.comment_text ? `<div style="color:#ccc;font-size:13px;margin-top:4px;">${r.comment_text}</div>` : ''}
+                ${r.admin_reply ? `<div style="background:rgba(123,92,255,0.15);border-radius:8px;padding:8px;margin-top:6px;font-size:12px;color:#c4b5fd;"><strong>Owner reply:</strong> ${r.admin_reply}</div>` : ''}
+              </div>
+            `).join('');
+          } catch (err) {
+            listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#ff6b6b;">Failed to load comments.</div>';
+          }
+        }
+
+        viewBtn.addEventListener('click', () => {
+          viewOverlay.classList.add('active');
+          loadRatings();
+        });
+        viewClose.addEventListener('click', () => viewOverlay.classList.remove('active'));
+        viewOverlay.addEventListener('click', (e) => {
+          if (e.target === viewOverlay) viewOverlay.classList.remove('active');
+        });
+      })();
+    </script>
 
     <script>
       (function () {
