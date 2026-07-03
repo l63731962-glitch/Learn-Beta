@@ -57,6 +57,7 @@ def init_db():
     from eduai.app import streak_models       # noqa: F401 — Streaks/Challenges/Parent tables
     from eduai.app import battle_models       # noqa: F401 — Battle Mode + Textbook Scanner tables
     from eduai.app import phase3_models       # noqa: F401 — Curriculum gap + exam readiness tables
+    from eduai.app import community_models    # noqa: F401 — ensures AppRating table is created
     Base.metadata.create_all(bind=engine)
     print("[EDUAI-DB] ✅ Tables created / verified (core + community + streaks + battle + phase3)")
 
