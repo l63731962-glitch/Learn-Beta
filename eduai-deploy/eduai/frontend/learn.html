@@ -4213,6 +4213,141 @@
         color: #fca5a5;
         background: rgba(239, 68, 68, 0.15);
       }
+
+      /* ===== Rating Modal ===== */
+      .rating-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+      }
+      .rating-modal-overlay.active {
+        display: flex;
+      }
+      .rating-modal-box {
+        background: #12121a;
+        border: 1px solid rgba(120, 100, 255, 0.35);
+        border-radius: 14px;
+        padding: 28px 26px;
+        width: 90%;
+        max-width: 380px;
+        box-shadow: 0 0 40px rgba(120, 80, 255, 0.25);
+        position: relative;
+        animation: ratingModalIn 0.25s ease;
+      }
+      @keyframes ratingModalIn {
+        from { opacity: 0; transform: translateY(10px) scale(0.97); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      .rating-modal-close {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        background: none;
+        border: none;
+        color: #999;
+        font-size: 20px;
+        cursor: pointer;
+        line-height: 1;
+      }
+      .rating-modal-close:hover { color: #fff; }
+      .rating-modal-title {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .rating-modal-sub {
+        color: #999;
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+      .rating-input-group { margin-bottom: 14px; }
+      .rating-input-group label {
+        display: block;
+        color: #bbb;
+        font-size: 12px;
+        margin-bottom: 5px;
+      }
+      .rating-input-group input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: #1a1a24;
+        color: #fff;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+      .rating-input-group input:focus {
+        outline: none;
+        border-color: #7b5cff;
+      }
+      .rating-error {
+        color: #ff6b6b;
+        font-size: 12px;
+        margin-top: 4px;
+        display: none;
+      }
+      .rating-next-btn, .rating-submit-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #7b5cff, #5c3cff);
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        margin-top: 6px;
+      }
+      .rating-next-btn:hover, .rating-submit-btn:hover { opacity: 0.9; }
+      .rating-stars-step { display: none; text-align: center; }
+      .rating-stars-wrap {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin: 18px 0;
+      }
+      .rating-star {
+        font-size: 34px;
+        color: #444;
+        cursor: pointer;
+        transition: transform 0.15s ease, color 0.15s ease;
+        user-select: none;
+      }
+      .rating-star:hover { transform: scale(1.15); }
+      .rating-star.filled { color: #ffc93c; }
+      .rating-thankyou {
+        display: none;
+        text-align: center;
+        color: #fff;
+        padding: 10px 0;
+      }
+      .rating-thankyou .big-check {
+        font-size: 40px;
+        color: #4ade80;
+        margin-bottom: 10px;
+      }
+      .rating-trigger-btn {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-family: "Lexend", sans-serif;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 10px 18px;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .rating-trigger-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
     </style>
   </head>
   <body>
@@ -17886,5 +18021,179 @@ function _backToReg() {
     </script>
 
     <script src="/static/theme-engine.js"></script>
+
+    <!-- Rate App Trigger Button -->
+    <button id="openRatingModalBtn" class="rating-trigger-btn">⭐ Rate this App</button>
+
+    <!-- Rating Modal -->
+    <div class="rating-modal-overlay" id="ratingModalOverlay">
+      <div class="rating-modal-box">
+        <button class="rating-modal-close" id="ratingModalClose">&times;</button>
+
+        <!-- Step 1: Details -->
+        <div id="ratingDetailsStep">
+          <div class="rating-modal-title">Before you rate us...</div>
+          <div class="rating-modal-sub">Tell us a bit about you so we can follow up if needed.</div>
+
+          <div class="rating-input-group">
+            <label for="ratingName">Full Name</label>
+            <input type="text" id="ratingName" placeholder="e.g. Michael Anyanwu" />
+          </div>
+
+          <div class="rating-input-group">
+            <label for="ratingSchool">School</label>
+            <input type="text" id="ratingSchool" placeholder="e.g. Green Valley Secondary School" />
+          </div>
+
+          <div class="rating-input-group">
+            <label for="ratingGmail">Gmail Address</label>
+            <input type="email" id="ratingGmail" placeholder="e.g. name@gmail.com" />
+            <div class="rating-error" id="ratingErrorMsg">Please fill all fields with a valid Gmail address.</div>
+          </div>
+
+          <button class="rating-next-btn" id="ratingNextBtn">Continue</button>
+        </div>
+
+        <!-- Step 2: Stars -->
+        <div id="ratingStarsStep" class="rating-stars-step">
+          <div class="rating-modal-title">How would you rate us?</div>
+          <div class="rating-modal-sub">Tap a star to select your rating.</div>
+
+          <div class="rating-stars-wrap" id="ratingStarsWrap">
+            <span class="rating-star" data-value="1">★</span>
+            <span class="rating-star" data-value="2">★</span>
+            <span class="rating-star" data-value="3">★</span>
+            <span class="rating-star" data-value="4">★</span>
+            <span class="rating-star" data-value="5">★</span>
+          </div>
+
+          <button class="rating-submit-btn" id="ratingSubmitBtn">Submit Rating</button>
+        </div>
+
+        <!-- Step 3: Thank you -->
+        <div id="ratingThankYouStep" class="rating-thankyou">
+          <div class="big-check">✓</div>
+          <div class="rating-modal-title">Thank you!</div>
+          <div class="rating-modal-sub">Your feedback helps us improve EduMind AI.</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const overlay = document.getElementById('ratingModalOverlay');
+        const openBtn = document.getElementById('openRatingModalBtn');
+        const closeBtn = document.getElementById('ratingModalClose');
+
+        const detailsStep = document.getElementById('ratingDetailsStep');
+        const starsStep = document.getElementById('ratingStarsStep');
+        const thankYouStep = document.getElementById('ratingThankYouStep');
+
+        const nameInput = document.getElementById('ratingName');
+        const schoolInput = document.getElementById('ratingSchool');
+        const gmailInput = document.getElementById('ratingGmail');
+        const errorMsg = document.getElementById('ratingErrorMsg');
+
+        const nextBtn = document.getElementById('ratingNextBtn');
+        const submitBtn = document.getElementById('ratingSubmitBtn');
+        const starsWrap = document.getElementById('ratingStarsWrap');
+        const stars = starsWrap.querySelectorAll('.rating-star');
+
+        let selectedRating = 0;
+        let userDetails = {};
+
+        function openModal() {
+          overlay.classList.add('active');
+          detailsStep.style.display = 'block';
+          starsStep.style.display = 'none';
+          thankYouStep.style.display = 'none';
+        }
+
+        function closeModal() {
+          overlay.classList.remove('active');
+        }
+
+        function resetStars() {
+          selectedRating = 0;
+          stars.forEach(s => s.classList.remove('filled'));
+        }
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) closeModal();
+        });
+
+        nextBtn.addEventListener('click', () => {
+          const name = nameInput.value.trim();
+          const school = schoolInput.value.trim();
+          const gmail = gmailInput.value.trim();
+
+          const gmailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+          if (!name || !school || !gmailPattern.test(gmail)) {
+            errorMsg.style.display = 'block';
+            return;
+          }
+          errorMsg.style.display = 'none';
+
+          userDetails = { name, school, gmail };
+
+          detailsStep.style.display = 'none';
+          starsStep.style.display = 'block';
+        });
+
+        stars.forEach(star => {
+          star.addEventListener('click', () => {
+            selectedRating = parseInt(star.getAttribute('data-value'));
+            stars.forEach(s => {
+              s.classList.toggle('filled', parseInt(s.getAttribute('data-value')) <= selectedRating);
+            });
+          });
+        });
+
+        submitBtn.addEventListener('click', async () => {
+          if (selectedRating === 0) {
+            alert('Please select a star rating first.');
+            return;
+          }
+
+          const payload = {
+            name: userDetails.name,
+            school: userDetails.school,
+            gmail: userDetails.gmail,
+            rating: selectedRating,
+            timestamp: new Date().toISOString()
+          };
+
+          const existing = JSON.parse(localStorage.getItem('appRatings') || '[]');
+          existing.push(payload);
+          localStorage.setItem('appRatings', JSON.stringify(existing));
+
+          /*
+          try {
+            await fetch('/eduai/ratings/submit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+          } catch (err) {
+            console.error('Rating submit failed:', err);
+          }
+          */
+
+          starsStep.style.display = 'none';
+          thankYouStep.style.display = 'block';
+
+          setTimeout(() => {
+            closeModal();
+            resetStars();
+            nameInput.value = '';
+            schoolInput.value = '';
+            gmailInput.value = '';
+          }, 2200);
+        });
+      })();
+    </script>
   </body>
 </html>
