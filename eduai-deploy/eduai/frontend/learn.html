@@ -18067,6 +18067,11 @@ function _backToReg() {
             <span class="rating-star" data-value="5">★</span>
           </div>
 
+          <div class="rating-input-group">
+            <label for="ratingComment">What do you think about the app? (optional)</label>
+            <textarea id="ratingComment" rows="3" placeholder="Tell us what you liked, or what we should fix..." style="width:100%;resize:vertical;background:inherit;color:inherit;font:inherit;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px;"></textarea>
+          </div>
+
           <button class="rating-submit-btn" id="ratingSubmitBtn">Submit Rating</button>
         </div>
 
@@ -18096,6 +18101,7 @@ function _backToReg() {
 
         const nextBtn = document.getElementById('ratingNextBtn');
         const submitBtn = document.getElementById('ratingSubmitBtn');
+        const commentInput = document.getElementById('ratingComment');
         const starsWrap = document.getElementById('ratingStarsWrap');
         const stars = starsWrap.querySelectorAll('.rating-star');
 
@@ -18159,28 +18165,22 @@ function _backToReg() {
           }
 
           const payload = {
-            name: userDetails.name,
-            school: userDetails.school,
-            gmail: userDetails.gmail,
-            rating: selectedRating,
-            timestamp: new Date().toISOString()
+            stars: selectedRating,
+            comment_text: commentInput.value.trim()
           };
 
-          const existing = JSON.parse(localStorage.getItem('appRatings') || '[]');
-          existing.push(payload);
-          localStorage.setItem('appRatings', JSON.stringify(existing));
-
-          /*
           try {
             await fetch('/eduai/ratings/submit', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('ea-edutoken') || ''}`
+              },
               body: JSON.stringify(payload)
             });
           } catch (err) {
             console.error('Rating submit failed:', err);
           }
-          */
 
           starsStep.style.display = 'none';
           thankYouStep.style.display = 'block';
