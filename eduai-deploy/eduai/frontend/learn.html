@@ -18099,29 +18099,83 @@ function _backToReg() {
         const viewOverlay = document.getElementById('viewRatingsOverlay');
         const viewClose = document.getElementById('viewRatingsClose');
         const listArea = document.getElementById('ratingsListArea');
+    
+const RATINGS_ADMIN_EMAIL = "anyanwumichael1800@gmail.com";
+
+function isRatingsAdmin() {
+  const user = (typeof S !== "undefined" && S.user) ? S.user : null;
+  return !!(user && user.email && user.email.toLowerCase() === RATINGS_ADMIN_EMAIL.toLowerCase());
+}
 
         async function loadRatings() {
-          listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">Loading...</div>';
-          try {
-            const res = await fetch('/eduai/ratings/list');
-            const data = await res.json();
-            const ratings = data.ratings || [];
-            if (!ratings.length) {
-              listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">No comments yet.</div>';
-              return;
-            }
-            listArea.innerHTML = ratings.map(r => `
-              <div style="border-bottom:1px solid rgba(255,255,255,0.1);padding:12px 0;">
-                <div style="color:#ffc93c;font-size:14px;">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
-                <div style="color:#fff;font-size:13px;margin-top:4px;">${r.user_name}</div>
-                ${r.comment_text ? `<div style="color:#ccc;font-size:13px;margin-top:4px;">${r.comment_text}</div>` : ''}
-                ${r.admin_reply ? `<div style="background:rgba(123,92,255,0.15);border-radius:8px;padding:8px;margin-top:6px;font-size:12px;color:#c4b5fd;"><strong>Owner reply:</strong> ${r.admin_reply}</div>` : ''}
-              </div>
-            `).join('');
-          } catch (err) {
-            listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#ff6b6b;">Failed to load comments.</div>';
-          }
-        }
+  listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">Loading...</div>';
+  try {
+    const res = await fetch('/community/ratings/list');
+    const data = await res.json();
+    const ratings = data.ratings || [];
+    if (!ratings.length) {
+      listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">No comments yet.</div>';
+      return;
+    }
+    const admin = isRatingsAdmin();
+    listArea.innerHTML = ratings.map(r => `
+      <div style="border-bottom:1px solid rgba(255,255,255,0.1);padding:12px 0;">
+        <div style="color:#ffc93c;font-size:14px;">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+        <div style="color:#fff;font-size:13px;margin-top:4px;">${r.user_name}</div>
+        ${r.comment_text ? `<div style="color:#ccc;font-size:13px;margin-top:4px;">${r.comment_text}</div>` : ''}
+        ${r.admin_reply ? `<div style="background:rgba(123,92,255,0.15);border-radius:8px;padding:8px;margin-top:6px;font-size:12px;color:#c4b5fd;"><strong>Owner reply:</strong> ${r.admin_reply}</div>` : ''}
+        ${admin ? `
+          <div id="reply-box-${r.id}" style="margin-top:8px;${r.admin_reply ? 'display:none;' : ''}">
+            <textarea id="reply-input-${r.id}" placeholder="Write a reply as the app owner..."
+              style="width:100%;resize:vertical;background:#1a1a24;color:#fff;font:inherit;font-size:12px;
+                     border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px;box-sizing:border-box;"
+              rows="2">${r.admin_reply || ''}</textarea>
+            <button onclick="submitAdminReply(${r.id})"
+              style="margin-top:6px;padding:6px 14px;border:none;border-radius:8px;
+                     background:linear-gradient(135deg,#7b5cff,#5c3cff);color:#fff;
+                     font-weight:600;font-size:12px;cursor:pointer;">
+              ${r.admin_reply ? 'Update Reply' : 'Post Reply'}
+            </button>
+          </div>
+          ${r.admin_reply ? `
+            <button onclick="document.getElementById('reply-box-${r.id}').style.display='block'; this.style.display='none';"
+              style="margin-top:6px;background:none;border:none;color:#a78bfa;font-size:11px;cursor:pointer;text-decoration:underline;padding:0;">
+              Edit reply
+            </button>` : ''}
+        ` : ''}
+      </div>
+    `).join('');
+  } catch (err) {
+    listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#ff6b6b;">Failed to load comments.</div>';
+  }
+}
+window.submitAdminReply = async function (ratingId) {
+  const input = document.getElementById(`reply-input-${ratingId}`);
+  const text = input.value.trim();
+  if (!text) {
+    toast("Reply can't be empty", "error");
+    return;
+  }
+  try {
+    const res = await fetch('/community/ratings/reply', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('ea-edutoken') || ''}`
+      },
+      body: JSON.stringify({ rating_id: ratingId, admin_reply: text })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      toast(data.error || "Failed to post reply", "error");
+      return;
+    }
+    toast("✅ Reply posted!", "success");
+    loadRatings();
+  } catch (err) {
+    toast("Network error posting reply", "error");
+  }
+};
 
         viewBtn.addEventListener('click', () => {
           viewOverlay.classList.add('active');
@@ -18135,6 +18189,13 @@ function _backToReg() {
     </script>
 
     <script>
+const RATINGS_ADMIN_EMAIL = "anyanwumichael1800@gmail.com";
+
+function isRatingsAdmin() {
+  const user = (typeof S !== "undefined" && S.user) ? S.user : null;
+  return !!(user && user.email && user.email.toLowerCase() === RATINGS_ADMIN_EMAIL.toLowerCase());
+}
+
       (function () {
         const overlay = document.getElementById('ratingModalOverlay');
         const openBtn = document.getElementById('openRatingModalBtn');
