@@ -92,6 +92,15 @@ class User(Base):
     coins              = Column(Integer, default=0)
     last_activity_date= Column(String(10), nullable=True)  # 'YYYY-MM-DD' UTC, for streak calc
 
+# ── Subscription / Paywall ───────────────────────────────────────────
+    subscription_status = Column(String(20), default="trial")  
+    # "trial" | "active" | "past_due" | "cancelled" | "expired"
+    trial_started_at    = Column(DateTime, default=datetime.utcnow)
+    trial_ends_at        = Column(DateTime, nullable=True)
+    paypal_subscription_id = Column(String(100), nullable=True, index=True)
+    paypal_plan_id       = Column(String(100), nullable=True)
+    subscription_updated_at = Column(DateTime, nullable=True)
+
 # ── Lesson Note ─────────────────────────────────────────────────────────────
 
 class LessonNote(Base):
