@@ -32,10 +32,12 @@ def _find_learn_html():
 
 @app.route("/")
 def index():
+    
     path = _find_learn_html()
     if path:
         return send_file(path)
     return "<h2>learn.html not found</h2><p>Place it in <code>eduai/frontend/learn.html</code></p>", 404
+
 
 @app.route("/learn")
 def learn_page():
