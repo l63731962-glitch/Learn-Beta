@@ -99,6 +99,11 @@ class User(Base):
     trial_ends_at        = Column(DateTime, nullable=True)
     paypal_subscription_id = Column(String(100), nullable=True, index=True)
     paypal_plan_id       = Column(String(100), nullable=True)
+    payment_provider        = Column(String(20), nullable=True)  # 'paypal' | 'paystack'
+    paystack_customer_code  = Column(String(100), nullable=True, index=True)
+    paystack_subscription_code = Column(String(100), nullable=True)
+    paystack_plan_code      = Column(String(100), nullable=True)
+    paystack_email_token    = Column(String(200), nullable=True)  # required by Paystack to cancel
     subscription_updated_at = Column(DateTime, nullable=True)
 
 # ── Lesson Note ─────────────────────────────────────────────────────────────
