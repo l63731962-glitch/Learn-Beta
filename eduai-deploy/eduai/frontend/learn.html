@@ -8322,11 +8322,24 @@
             <li>Cancel anytime, no questions asked</li>
           </ul>
 
-          <div id="paypal-button-container">
-            <div class="paywall-loading-paypal">
-              Loading secure checkout…
-            </div>
-          </div>
+          <div id="payment-provider-toggle" style="display:flex; gap:8px; margin-bottom:16px;">
+  <button id="pp-toggle-paystack" class="btn btn-sm" style="flex:1; justify-content:center; background:rgba(0,184,148,0.2); color:#6ee7b7; border:1px solid rgba(0,184,148,0.35);" onclick="switchPaymentProvider('paystack')">
+    🇳🇬 Pay with Card/Bank (Paystack)
+  </button>
+  <button id="pp-toggle-paypal" class="btn btn-sm btn-ghost" style="flex:1; justify-content:center;" onclick="switchPaymentProvider('paypal')">
+    🌍 Pay with PayPal
+  </button>
+</div>
+
+<div id="paystack-button-container">
+  <div class="paywall-loading-paypal">Loading secure checkout…</div>
+</div>
+
+<div id="paypal-button-container" style="display:none;">
+  <div class="paywall-loading-paypal">
+    Loading secure checkout…
+  </div>
+</div>
         </div>
 
         <div class="paywall-status" id="paywall-status"></div>
@@ -18019,6 +18032,169 @@ function _backToReg() {
         }
       });
     </script>
+
+    <script>
+  /* ═══════════════ PAYSTACK PAYWALL LOGIC ═══════════════ */
+
+  const PAYSTACK_CONFIG = {
+    // Get this from Paystack Dashboard → Settings → API Keys & Webhooks → Public Key
+    publicKey: "pk_live_YOUR_PAYSTACK_PUBLIC_KEY",
+  };
+
+  let _paystackScriptLoaded = false;
+  let _paystackScriptLoading = null;
+  let _activePaymentProvider = "paystack"; // default — Nigerian users see this first
+
+  function _loadPaystackScript() {
+    if (_paystackScriptLoaded) return Promise.resolve();
+    if (_paystackScriptLoading) return _paystackScriptLoading;
+    _paystackScriptLoading = new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = "https://js.paystack.co/v1/inline.js";
+      s.onload = () => {
+        _paystackScriptLoaded = true;
+        resolve();
+      };
+      s.onerror = () => reject(new Error("Failed to load Paystack script"));
+      document.head.appendChild(s);
+    });
+    return _paystackScriptLoading;
+  }
+
+  function switchPaymentProvider(provider) {
+    _activePaymentProvider = provider;
+    const paystackToggle = el("pp-toggle-paystack");
+    const paypalToggle = el("pp-toggle-paypal");
+    const paystackBox = el("paystack-button-container");
+    const paypalBox = el("paypal-button-container");
+
+    if (provider === "paystack") {
+      paystackToggle.style.background = "rgba(0,184,148,0.2)";
+      paystackToggle.style.color = "#6ee7b7";
+      paystackToggle.style.border = "1px solid rgba(0,184,148,0.35)";
+      paypalToggle.className = "btn btn-sm btn-ghost";
+      paypalToggle.style.background = "";
+      paypalToggle.style.color = "";
+      paypalToggle.style.border = "";
+      paystackBox.style.display = "block";
+      paypalBox.style.display = "none";
+      loadPaystackCheckout();
+    } else {
+      paypalToggle.style.background = "rgba(99,102,241,0.2)";
+      paypalToggle.style.color = "#a78bfa";
+      paypalToggle.style.border = "1px solid rgba(99,102,241,0.35)";
+      paystackToggle.className = "btn btn-sm btn-ghost";
+      paystackToggle.style.background = "";
+      paystackToggle.style.color = "";
+      paystackToggle.style.border = "";
+      paypalBox.style.display = "block";
+      paystackBox.style.display = "none";
+    }
+  }
+
+  async function loadPaystackCheckout() {
+    const container = el("paystack-button-container");
+    if (!container) return;
+    container.innerHTML = '<div class="paywall-loading-paypal">Loading secure checkout…</div>';
+
+    let info;
+    try {
+      info = await EduAPI.billing.paystackPlanInfo();
+    } catch (e) {
+      container.innerHTML = "";
+      _paywallStatus("Could not load Paystack plan info. Please try again.", "error");
+      return;
+    }
+    if (info && info.error) {
+      container.innerHTML = "";
+      _paywallStatus(info.error, "error");
+      return;
+    }
+    if (!info.plan_code) {
+      container.innerHTML = "";
+      _paywallStatus("Paystack subscriptions aren't configured yet. Please contact support.", "error");
+      return;
+    }
+
+    // Update the price display to reflect NGN pricing when Paystack is active
+    el("paywall-price").innerHTML = `₦${info.amount_ngn.toLocaleString()}<span>/month</span>`;
+
+    try {
+      await _loadPaystackScript();
+      _renderPaystackButton(info, container);
+    } catch (e) {
+      container.innerHTML = "";
+      _paywallStatus("Could not load Paystack checkout. Check your connection.", "error");
+    }
+  }
+
+  function _renderPaystackButton(info, container) {
+    container.innerHTML = "";
+    const btn = document.createElement("button");
+    btn.className = "btn btn-primary btn-lg";
+    btn.style.cssText = "width:100%; justify-content:center; background:linear-gradient(135deg,#00b894,#00d4a8);";
+    btn.textContent = `Subscribe — ₦${info.amount_ngn.toLocaleString()}/month`;
+    btn.onclick = () => _startPaystackCheckout(info);
+    container.appendChild(btn);
+  }
+
+  function _startPaystackCheckout(info) {
+    if (!window.PaystackPop) {
+      _paywallStatus("Paystack failed to load. Please refresh and try again.", "error");
+      return;
+    }
+
+    const userEmail = (window.S && S.user && S.user.email) || "";
+
+    const handler = window.PaystackPop.setup({
+      key: PAYSTACK_CONFIG.publicKey,
+      email: userEmail,
+      amount: info.amount_ngn * 100, // Paystack expects kobo
+      currency: "NGN",
+      plan: info.plan_code,
+      ref: "eduai_" + Date.now() + "_" + Math.floor(Math.random() * 1000000),
+      callback: function (response) {
+        _paywallStatus("Confirming your subscription…", null);
+        _confirmPaystackPayment(response.reference);
+      },
+      onClose: function () {
+        _paywallStatus("Checkout cancelled — no charge was made.", null);
+      },
+    });
+    handler.openIframe();
+  }
+
+  async function _confirmPaystackPayment(reference) {
+    try {
+      const res = await EduAPI.billing.paystackActivate(reference);
+      if (res && res.status === "active") {
+        _paywallStatus("You're all set! Subscription active.", "success");
+        confetti();
+        toast("🎉 Subscription activated — welcome back!", "success");
+        setTimeout(() => {
+          closePaywall();
+          refreshTrialBanner();
+        }, 1400);
+      } else {
+        _paywallStatus(
+          (res && res.error) || "Could not confirm your subscription. Contact support.",
+          "error"
+        );
+      }
+    } catch (e) {
+      _paywallStatus("Something went wrong confirming payment.", "error");
+    }
+  }
+
+  // Auto-load Paystack checkout as the default provider when the paywall opens.
+  // This wraps the existing openPaywall() so both providers stay in sync.
+  const _originalOpenPaywall = openPaywall;
+  openPaywall = async function () {
+    await _originalOpenPaywall();
+    // Reset toggle state to Paystack default each time the modal opens
+    switchPaymentProvider("paystack");
+  };
+</script>
 
     <script src="/static/theme-engine.js"></script>
 
