@@ -324,6 +324,23 @@ const EduAPI = (() => {
     async cancel() {
       return _post('/eduai/billing/cancel');
     },
+
+    // ── Paystack ──────────────────────────────────────────────
+    /** Returns { plan_code, amount_ngn, public_key, subscription_status, trial_ends_at } */
+    async paystackPlanInfo() {
+      return _get('/eduai/billing/paystack/plan-info');
+    },
+    /** Returns { authorization_url, access_code, reference } */
+    async paystackInitialize() {
+      return _post('/eduai/billing/paystack/initialize');
+    },
+    /** Call after Paystack checkout redirects back with a reference */
+    async paystackActivate(reference) {
+      return _post('/eduai/billing/paystack/activate', { reference });
+    },
+    async paystackCancel() {
+      return _post('/eduai/billing/paystack/cancel');
+    },
   };
 
   // ════════════════════════════════════════════════════════════
