@@ -94,6 +94,12 @@ try:
     print("[EDUAI] ✅ Billing routes registered")
 except Exception as e:
     print(f"[EDUAI] ⚠️  Billing routes: {e}")
+try:
+    from eduai.app.routes.paystack_billing_routes import register_paystack_billing_routes
+    register_paystack_billing_routes(app)
+    print("[EDUAI] ✅ Paystack billing routes registered")
+except Exception as e:
+    print(f"[EDUAI] ⚠️  Paystack billing routes: {e}")
 
 if __name__ == "__main__":
     learn_path = _find_learn_html()
