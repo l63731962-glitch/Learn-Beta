@@ -145,6 +145,11 @@ def init_db():
         "trial_ends_at":           "DATETIME",
         "paypal_subscription_id":  "VARCHAR(100)",
         "paypal_plan_id":          "VARCHAR(100)",
+        "payment_provider":            "VARCHAR(20)",
+        "paystack_customer_code":      "VARCHAR(100)",
+        "paystack_subscription_code":  "VARCHAR(100)",
+        "paystack_plan_code":          "VARCHAR(100)",
+        "paystack_email_token":        "VARCHAR(200)",
         "subscription_updated_at": "DATETIME",
     }
     try:
