@@ -1068,6 +1068,16 @@
         margin-left: 260px;
         padding: 36px;
         min-height: 100vh;
+        position: relative;
+        z-index: 2;
+      }
+      /* Theme particle canvas (trophies/confetti/snow) is tuned for large
+         desktop viewports. On phones the same particle count reads as
+         clutter over a much smaller content area, so dim it further. */
+      @media (max-width: 640px) {
+        #theme-particle-canvas {
+          opacity: 0.35 !important;
+        }
       }
       .t-header {
         display: flex;
@@ -1191,6 +1201,49 @@
         }
         .t-sidebar {
           display: none;
+        }
+      }
+
+      /* ── Phone tier: single column, stacked header, no cramping ── */
+      @media (max-width: 640px) {
+        .t-main {
+          padding: 16px;
+        }
+        .t-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 14px;
+        }
+        .t-header > div[style*="display: flex"] {
+          width: 100%;
+          flex-wrap: wrap;
+        }
+        .t-greeting {
+          font-size: 21px;
+        }
+        .stat-grid {
+          grid-template-columns: 1fr;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+        .qa-grid {
+          grid-template-columns: 1fr;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+        .stat-card,
+        .qa-card {
+          padding: 16px;
+        }
+        .stat-num {
+          font-size: 28px;
+        }
+      }
+
+      /* ── Tablet tier: 2 columns feel less sparse than phone's 1 ── */
+      @media (min-width: 641px) and (max-width: 1000px) {
+        .t-main {
+          padding: 24px;
         }
       }
 
@@ -8849,6 +8902,18 @@
         tests_generated: "Tests Generated",
         students_assessed: "Students Assessed",
         class_average: "Class Average",
+        trend_ai_notes: "AI-generated notes",
+        trend_cbt_downloadable: "CBT & downloadable",
+        trend_across_tests: "Across all tests",
+        trend_all_cbt: "All CBT results",
+        generate_lesson: "Generate Lesson Note",
+        generate_lesson_desc: "AI-crafted, structured, print-ready lesson notes in any language",
+        create_test: "Create a Test",
+        create_test_desc: "CBT with live monitoring or downloadable PDF with answer key",
+        scheme_of_work: "Scheme of Work",
+        scheme_of_work_desc: "Upload your scheme and AI generates all lesson notes at once",
+        performance: "Student Performance",
+        leaderboard: "Leaderboard",
       };
 
       // S.i18nDict holds the active language's full {key: text} map, fetched
@@ -8864,7 +8929,15 @@
        * shows "undefined" while a fetch is in flight.
        */
       function t(key) {
-        return S.i18nDict[key] || I18N_BOOTSTRAP_EN[key] || key;
+        const hit = S.i18nDict[key] || I18N_BOOTSTRAP_EN[key];
+        if (hit) return hit;
+        // Last-resort fallback: never show a raw snake_case key on screen.
+        // Prettify it ("trend_ai_notes" -> "Trend ai notes") so a missing
+        // translation is merely unpolished, not visibly broken.
+        console.warn(`[i18n] missing key: "${key}"`);
+        return key
+          .replace(/_/g, " ")
+          .replace(/^./, (c) => c.toUpperCase());
       }
 
       /**
@@ -8949,7 +9022,8 @@
         });
         // Labels
         document.querySelectorAll("[data-t]").forEach((el_) => {
-          el_.textContent = t(el_.dataset.t);
+          const translated = t(el_.dataset.t);
+          if (translated) el_.textContent = translated;
         });
         // RTL for Arabic
         document.body.style.direction =
